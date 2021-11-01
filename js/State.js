@@ -1,5 +1,12 @@
 //AbstrakteKlasse
 export default class State {
+	//TODO: FRAGE: soll ein statisches Attribut sein, oder besser im Constructo???
+	KEY = {
+		LEFT: ['ArrowLeft', 'a'],
+		RIGHT: ['ArrowRight', 'd'],
+		JUMP: ['Space', ' ']
+	}
+	
 	constructor() {
 		if (this.constructor === State) {
 			throw new Error("Abstract classes can't be instantiated.");
@@ -17,7 +24,7 @@ export default class State {
 	}
 	
 	//Abstrake Methode
-	getEventup() {
+	getEvent() {
 		throw new Error("Method 'getEvent()' must be implemented.");
 	}
 	
