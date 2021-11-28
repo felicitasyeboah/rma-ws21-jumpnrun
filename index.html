@@ -8,21 +8,21 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" type="text/css" href="css/styles.css" media="screen"/>
     <title>Jump n Run - Felicitas Yeboah</title>
-    <script src="https://code.createjs.com/1.0.0/createjs.min.js"></script> <!-- bisher nicht benötigt -->
 </head>
 <body>
 <canvas id="gameCanvas" width="640" height="640">Ihr Browser unterstuetzt kein Canvas Element.</canvas>
 
-<script src="js/lib/preloadjs.js"></script>
-<script src="js/main.js" type="module"></script>
-<script src="js/StateController.js" type="module"></script>
-<script src="js/Player.js" type="module"></script>
-<script src="js/State.js" type="module"></script>
-<script src="js/WorldView.js" type=module"></script>
-<script src="js/StartmenuView.js" type=module"></script>
-<script src="js/HighscoreView.js" type=module"></script>
-<script src="js/InstructionView.js" type=module"></script>
-<script src="js/GameModel.js" type=module"></script>
 
+<script type="importmap" defer>
+{
+  "imports": {
+    "createjs-module": "/node_modules/createjs-module/createjs.js"
+  }
+}
+
+</script>
+<script src="js/main.js" type="module" defer></script>
+<script src="js/lib/createjs.js" defer></script>
 </body>
+
 </html>
