@@ -1,0 +1,23 @@
+{
+  "name": "rma",
+  "version": "1.0.0",
+  "description": "Lorem Ipsum",
+  "main": "main.js",
+  "dependencies": {
+    "createjs-module": "^0.8.3"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/felicitasyeboah/rma-ws21-jumpnrun.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/felicitasyeboah/rma-ws21-jumpnrun/issues"
+  },
+  "homepage": "https://github.com/felicitasyeboah/rma-ws21-jumpnrun#readme"
+}
