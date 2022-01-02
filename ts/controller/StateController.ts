@@ -28,6 +28,7 @@ export default class StateController {
         this.state.startup();
         this._registerEvents();
         this._handleResize(); // First draw
+
     }
 
     //setupStates(stateData, state) {
@@ -46,6 +47,8 @@ export default class StateController {
             this.worldController.update();
         }
         this.state.update();
+        this._renderDisplay();
+
     }
 
     _renderDisplay() {
@@ -59,16 +62,14 @@ export default class StateController {
             0,
             this.gameModel.canvasData.DISPLAY_CANVAS.width,
             this.gameModel.canvasData.DISPLAY_CANVAS.height);
-
     }
 
     _handleResize() {
         let height = document.documentElement.clientHeight;
         let width = document.documentElement.clientWidth;
-        console.log("TILE SIZE", this.gameModel.canvasData.TILE_SIZE);
-        console.log("CANVAS WIDTH", this.gameModel.canvasData.DISPLAY_CANVAS.width);
 
         this.gameModel.canvasData.DISPLAY_CANVAS.width = Math.floor(width / this.gameModel.canvasData.TILE_SIZE) * this.gameModel.canvasData.TILE_SIZE;
+
         if (this.gameModel.canvasData.DISPLAY_CANVAS.width > height) {
             this.gameModel.canvasData.DISPLAY_CANVAS.width = Math.floor(height / this.gameModel.canvasData.TILE_SIZE) * this.gameModel.canvasData.TILE_SIZE;
         }
@@ -89,7 +90,9 @@ export default class StateController {
         window.addEventListener('click', (event) => {
             this.state.getEvent(event);
         })
-        window.addEventListener("resize", this._handleResize);
+        window.addEventListener("resize", (event) => {
+            this._handleResize();
+        });
     }
 
     /**
@@ -107,10 +110,6 @@ export default class StateController {
         } else {
             this.timer += this.gameModel.getDeltatime();
         }
-        this._renderDisplay();
-
         requestAnimationFrame((timestamp) => this.mainGameLoop(timestamp));
-
-
     }
 }
