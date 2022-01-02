@@ -1,9 +1,11 @@
-import {GameModel} from "./GameModel.js";
-import {keyState} from "./main.js";
-import {Object} from "./Object.js";
+import {GameModel} from "../GameModel.js";
+import {keyState} from "../../main.js";
+import {GameObject} from "./GameObject.js";
 
-export class Player extends Object {
-    protected gameModel: GameModel;
+/**
+ * Erstellt ein Player-Objekt
+ */
+export class Player extends GameObject {
     private playerSprites: any;
     private colsInSpritesheet: number;
     private rowsInSpritesheet: number;
@@ -21,7 +23,6 @@ export class Player extends Object {
 
     constructor(gameModel: GameModel, x: number, y: number, w: number, h: number) {
         super(gameModel, x, y, w, h);
-        this.gameModel = gameModel;
         this.keyState = gameModel.keyState;
 
         this.playerSprites = gameModel.worldImages["tilesetPlayer"];
@@ -38,18 +39,23 @@ export class Player extends Object {
 
         this.w = 24;
         this.h = 24; // / this.spriteWidth * this.spriteHeight
-        this.x = gameModel.canvasData.TILE_SIZE;
-        this.y = 300;//gameModel.canvasData.CANVAS_HEIGHT - gameModel.canvasData.TILE_SIZE - this.h;
+        this.x = 35;
+        this.y = 512; //gameModel.canvasData.CANVAS_HEIGHT - gameModel.canvasData.TILE_SIZE - this.h;
 
         this.friction = gameModel.friction;
         this.gravity = gameModel.gravity;
 
-
-        this.jumpHeight = -45;
+        this.jumpHeight = -28;
     }
 
-    // Könnte auch als Update-Funktion bezeichnet werden...
-    // Udpated Playerposition
+    resetPlayerPos() {
+        this.x = 35;
+        this.y = 512;
+    }
+
+    /**
+     * Bewegt den Spieler
+     */
     move(/*playerDirection: string*/) {
 
         if (this.keyState.left) {
@@ -79,7 +85,9 @@ export class Player extends Object {
         // }
     }
 
-
+    /**
+     * Updated den Spieler
+     */
     update() {
         if (!this.jumping) {
             this.xVelocity *= this.friction;
@@ -94,8 +102,7 @@ export class Player extends Object {
         this.x += this.xVelocity;
     }
 
-
-    // Getter and Setters
+    // Getter and Setters \\
     setPos(x: number, y: number) {
         this.x = x;
         this.y = y;

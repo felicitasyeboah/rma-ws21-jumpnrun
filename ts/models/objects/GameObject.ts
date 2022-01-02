@@ -1,6 +1,6 @@
-import {GameModel} from "./GameModel.js";
+import {GameModel} from "../GameModel.js";
 
-export class Object {
+export class GameObject {
     protected xOld: number;
     protected yOld: number;
     protected x: number;
@@ -124,7 +124,7 @@ export class Object {
         return this.yVelocity;
     }
 
-    setYVeocity(number: number) {
+    setYVelocity(number: number) {
         this.yVelocity = number;
     }
 
@@ -137,7 +137,7 @@ export class Object {
     }
 }
 
-class GameItem extends Object {
+class GameItem extends GameObject {
     private image: any;
     protected gameModel: GameModel;
 
@@ -167,7 +167,9 @@ export class Exit extends GameItem {
     }
 }
 
-
+/**
+ * Oberklasse für bewegende Items der Karte
+ */
 class MovingItem extends GameItem {
     moveDirection: number;
     moveCounter: number
@@ -179,9 +181,14 @@ class MovingItem extends GameItem {
     }
 }
 
+/**
+ * Gegnerobjekt, das sich bewegt.
+ */
 export class Enemy extends MovingItem {
-    constructor(gameModel: GameModel, x: number, y: number, w: number, h: number) {
+    constructor(gameModel: GameModel, x: number, y: number, w: number, h: number, private moveX: number, private moveY: number) {
         super(gameModel, x, y, w, h);
+        this.moveX = moveX;
+        this.moveY = moveY;
     }
 
     //kann auch Updatefunktion werden
@@ -195,6 +202,9 @@ export class Enemy extends MovingItem {
     }
 }
 
+/**
+ * Bewegliche Platform
+ */
 export class MovingPlatform extends MovingItem {
     private moveX: number; // 1 = gesetzt (bewegt sich), 0 = ungesetzt(bewegt sich nicht)
     private moveY: number; // 1 = gesetzt (bewegt sich), 0 = ungesetzt(bewegt sich nicht)
@@ -215,4 +225,7 @@ export class MovingPlatform extends MovingItem {
             this.moveCounter *= -1;
         }
     }
+
+
 }
+
