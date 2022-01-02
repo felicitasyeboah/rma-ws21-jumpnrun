@@ -1,4 +1,4 @@
-import {GameModel} from "./GameModel.js";
+import {GameModel} from "../models/GameModel.js";
 import {State} from "./State.js";
 
 export default class StartmenuView extends State {
