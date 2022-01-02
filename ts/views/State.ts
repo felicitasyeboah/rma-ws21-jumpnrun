@@ -1,6 +1,9 @@
 //AbstrakteKlasse
-import {Canvasdata} from "./main.js";
+import {Canvasdata} from "../main.js";
 
+/**
+ * Die Abstrakte Klasse State wird von jeder View implementiert. Sie stellt die Views dar.
+ */
 export abstract class State {
     //TODO: FRAGE: soll ein statisches Attribut sein, oder besser im Constructo???
     public static KEY = {
@@ -8,10 +11,12 @@ export abstract class State {
         RIGHT: ['ArrowRight', 'd'],
         JUMP: [' ', 'w', 'ArrowUp']
     }
-    protected canvas = this.CANVAS_DATA.CANVAS;
-    protected ctx = this.CANVAS_DATA.CTX;
-    protected canvasHeight = this.CANVAS_DATA.CANVAS_HEIGHT;
-    protected canvasWidth = this.CANVAS_DATA.CANVAS_WIDTH;
+    protected bufferCanvas = this.CANVAS_DATA.BUFFER_CANVAS;
+    protected bufferCtx = this.CANVAS_DATA.BUFFER_CTX;
+    protected displayCanvas = this.CANVAS_DATA.DISPLAY_CANVAS;
+    protected displayCtx = this.CANVAS_DATA.DISPLAY_CTX;
+    protected gameHeight = this.CANVAS_DATA.GAME_HEIGHT;
+    protected gameWidth = this.CANVAS_DATA.GAME_WIDTH;
     protected mapRows = this.CANVAS_DATA.ROWS;
     protected mapCols = this.CANVAS_DATA.COLS;
     protected tileSize = this.CANVAS_DATA.TILE_SIZE;

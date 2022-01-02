@@ -1,10 +1,12 @@
 import {State} from './State.js';
-import {GameModel} from "./GameModel.js";
-import {Player} from "./Player.js";
+import {GameModel} from "../models/GameModel.js";
+import {Player} from "../models/objects/Player.js";
 
+/**
+ * Erstellt ein WorldView Objekt. Die WorldView stellt die Spielewelt dar.
+ */
 export class WorldView extends State {
     private tileMapData: any;
-    private currentLevel: number;
     private player: Player;
     private tilesetMap: any;
 
@@ -12,41 +14,48 @@ export class WorldView extends State {
         super(gameModel.canvasData);
         this.gameModel = gameModel;
         this.tileMapData = gameModel.tileMapLevelData;
-        this.currentLevel = 1;
 
         this.player = gameModel.player;
 
         this.tilesetMap = gameModel.worldImages["tilesetMap"];
     }
 
-    // startet die WorldView mit dem ersten Level
+    /**
+     * startet die WorldView mit dem ersten Level
+     */
     startup() {
-        if (this.currentLevel !== 1) {
-            this.currentLevel = 1;
+        if (this.gameModel.getCurrentLevel() !== 1) {
+            this.gameModel.setCurrentLevel(1);
         }
-        this.initLevel(1);
+        this.initLevel();
     }
 
-    // Initieriert das jeweilige Level
-    private initLevel(currentLevel: number) {
-        if (this.currentLevel !== currentLevel) {
-            this.currentLevel = currentLevel;
-        }
+    cleanup() {
+
+    }
+
+    /**
+     * Initiert das jeweilige Level
+     */
+    initLevel() {
         this.drawMap();
         this.drawPlayer();
     }
 
-    // Zeichnet die Map
+    /**
+     * Zeichnet die Map
+     * @private
+     */
     private drawMap() {
-        let levelMap = this.tileMapData["level" + this.currentLevel];
+        let levelMap = this.tileMapData["level" + this.gameModel.getCurrentLevel()];
         for (let row = 0; row < this.mapRows; row++) {
             for (let col = 0; col < this.mapCols; col++) {
 
                 let spritesInTileMap = 8;
-                let tile = levelMap[row][col] - 1;
+                let tile = levelMap[row][col];
                 let spriteWidth = this.tilesetMap.width / spritesInTileMap;
                 let spriteHeight = this.tilesetMap.height;
-                this.ctx.drawImage(this.tilesetMap,
+                this.bufferCtx.drawImage(this.tilesetMap,
                     tile * spriteWidth,
                     0,
                     spriteWidth,
@@ -55,25 +64,31 @@ export class WorldView extends State {
                     row * this.tileSize,
                     this.tileSize,
                     this.tileSize);
+                this.bufferCtx.strokeStyle = "darkgrey";
+                this.bufferCtx.lineWidth = 0.5;
+                this.bufferCtx.strokeRect(col * this.tileSize, row * this.tileSize, this.tileSize - this.bufferCtx.lineWidth, this.tileSize - this.bufferCtx.lineWidth);
             }
         }
     }
 
-    // zeichnet den Player
+    /**
+     * zeichnet den Player
+     * @private
+     */
     private drawPlayer() {
-        this.ctx.fillStyle = "lightgrey";
-        this.ctx.strokeStyle = "white";
-        this.ctx.lineWidth = 5;
-        this.ctx.fillRect(
+        this.bufferCtx.fillStyle = "lightgrey";
+        this.bufferCtx.strokeStyle = "white";
+        this.bufferCtx.lineWidth = 5;
+        this.bufferCtx.fillRect(
             this.player.getX(),
             this.player.getY(),
             this.player.getW(),
             this.player.getH());
-        this.ctx.strokeRect(
-            this.player.getX() + this.ctx.lineWidth * 0.5,
-            this.player.getY() + this.ctx.lineWidth * 0.5,
-            this.player.getW() - this.ctx.lineWidth,
-            this.player.getH() - this.ctx.lineWidth);
+        this.bufferCtx.strokeRect(
+            this.player.getX() + this.bufferCtx.lineWidth * 0.5,
+            this.player.getY() + this.bufferCtx.lineWidth * 0.5,
+            this.player.getW() - this.bufferCtx.lineWidth,
+            this.player.getH() - this.bufferCtx.lineWidth);
         // this.ctx.drawImage(this.player.getPlayerSprites(),
         //     this.player.getTileX() * this.player.getSpriteWidth(),
         //     this.player.getTileY() * this.player.getSpriteHeight(),
@@ -85,8 +100,12 @@ export class WorldView extends State {
         //     this.player.getH());
     }
 
-    // Prueft Tasteneingaben
-    getEvent(event: { [key: string]: string }) {
+    //TODO: Frage: Eventhandling auslagern in Controller?
+    /**
+     * Prueft die Tasteneingaben in der WorldView
+     * @param event
+     */
+    getEvent(event: any): void {
         if (event.type === "keydown") {
             if (State.KEY.LEFT.includes(event.key)) {
                 this.gameModel.keyState.left = true;
@@ -97,7 +116,7 @@ export class WorldView extends State {
             if (State.KEY.JUMP.includes(event.key)) {
                 if (!this.player.getJumping() && !this.gameModel.keyState.jump) {
                     this.gameModel.keyState.jump = true;
-                    this.player.setYVeocity(this.player.getJumpHeight());
+                    this.player.setYVelocity(this.player.getJumpHeight());
                 }
             }
         }
@@ -119,9 +138,13 @@ export class WorldView extends State {
         // }
     }
 
-    // Updated den Canvas
+
+    /**
+     * Redraws the View
+     */
     update() {
-        this.ctx.clearRect(0, 0, this.canvasWidth, this.canvasHeight);
+        this.bufferCtx.clearRect(0, 0, this.gameWidth, this.gameHeight);
+        this.displayCtx.clearRect(0, 0, this.displayCanvas.width, this.displayCanvas.height);
         this.drawMap();
         this.drawPlayer();
     }
