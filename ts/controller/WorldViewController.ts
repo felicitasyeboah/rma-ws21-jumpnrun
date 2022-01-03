@@ -15,11 +15,13 @@ export class WorldController {
     private rightTile: number;
     private bottomTile: number;
     private leftTile: number;
+    private levelMap: any;
 
     constructor(private gameModel: GameModel, private worldView: WorldView) {
         this.canvasData = gameModel.canvasData;
         this.player = gameModel.player;
         this.collisionMapData = gameModel.collisionMapData;
+        this.levelMap = this.worldView.getLevelMap;
 
         this.topTile = 0;
         this.rightTile = 0;
@@ -185,6 +187,7 @@ export class WorldController {
             case 52: // 52 = c_water
                 break;
             case 53: // 53 = c_coin
+                this.collideCoin(object, tileX, tileY);
                 break;
             case 54: // 54 = c_enemy wohl ueberfluessaig, da sich alle bwegen werden
                 break;
@@ -236,6 +239,10 @@ export class WorldController {
         } else {
             return false;
         }
+    }
+
+    collideCoin(object: GameObject, tileX: number, tileY: number) {
+        this.worldView.setLevelMapValue(tileY, tileX, 99);
     }
 
     // Updated die Daten der View

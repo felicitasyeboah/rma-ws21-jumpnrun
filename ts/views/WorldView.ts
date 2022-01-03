@@ -1,22 +1,24 @@
 import {State} from './State.js';
 import {GameModel} from "../models/GameModel.js";
 import {Player} from "../models/objects/Player.js";
+import {Enemy} from "../models/objects/GameObject.js";
 
 /**
  * Erstellt ein WorldView Objekt. Die WorldView stellt die Spielewelt dar.
  */
 export class WorldView extends State {
-    private tileMapData: any;
+    private tileMapLevelData: any;
     private player: Player;
     private tilesetMap: any;
+    private levelMap: number[][];
 
     constructor(private gameModel: GameModel) {
         super(gameModel.canvasData);
         this.gameModel = gameModel;
-        this.tileMapData = gameModel.tileMapLevelData;
+        this.tileMapLevelData = gameModel.tileMapLevelData;
 
         this.player = gameModel.player;
-
+        this.levelMap = [];
         this.tilesetMap = gameModel.worldImages["tilesetMap"];
     }
 
@@ -42,19 +44,79 @@ export class WorldView extends State {
         this.drawPlayer();
     }
 
+    readMap() {
+        this.levelMap = this.tileMapLevelData["level" + this.gameModel.getCurrentLevel()];
+        for (let row = 0; row < this.mapRows; row++) {
+            for (let col = 0; col < this.mapCols; col++) {
+
+                let spritesInTileMap = 8;
+                let tile = this.levelMap[row][col];
+                let spriteWidth = this.tilesetMap.width / spritesInTileMap;
+                let spriteHeight = this.tilesetMap.height;
+
+
+                // Gegner width = 50px, height = 35px
+                if (tile == 2) {
+                    let enemy = new Enemy(this.gameModel, col * this.tileSize, row * (this.tileSize - 35), this.tileSize, 35)
+                    let enemies: Enemy[] = this.gameModel.getEnemies();
+                    enemies.push(enemy);
+                    this.gameModel.setEnemies(enemies);
+                    this.bufferCtx.drawImage(this.tilesetMap,
+                        tile * spriteWidth,
+                        0,
+                        spriteWidth,
+                        spriteHeight,
+                        enemy.getX(),
+                        enemy.getY(),
+                        this.tileSize,
+                        this.tileSize);
+                }
+            }
+        }
+    }
+
     /**
      * Zeichnet die Map
      * @private
      */
     private drawMap() {
-        let levelMap = this.tileMapData["level" + this.gameModel.getCurrentLevel()];
+        this.levelMap = this.tileMapLevelData["level" + this.gameModel.getCurrentLevel()];
         for (let row = 0; row < this.mapRows; row++) {
             for (let col = 0; col < this.mapCols; col++) {
 
                 let spritesInTileMap = 8;
-                let tile = levelMap[row][col];
+                let tile = this.levelMap[row][col];
                 let spriteWidth = this.tilesetMap.width / spritesInTileMap;
                 let spriteHeight = this.tilesetMap.height;
+                // wenn eine Münze eingelesen wird
+                // if(tile == 6) {
+                //     this.bufferCtx.drawImage(this.tilesetMap,
+                //         tile * spriteWidth,
+                //         0,
+                //         spriteWidth,
+                //         spriteHeight,
+                //         col * this.tileSize,
+                //         row * this.tileSize,
+                //         this.tileSize,
+                //         this.tileSize);
+                // }
+
+                // Gegner width = 50px, height = 35px
+                if (tile == 2) {
+                    let enemy = new Enemy(this.gameModel, col * this.tileSize, row * (this.tileSize - 35), this.tileSize, 35)
+                    let enemies: Enemy[] = this.gameModel.getEnemies();
+                    enemies.push(enemy);
+                    this.gameModel.setEnemies(enemies);
+                    this.bufferCtx.drawImage(this.tilesetMap,
+                        tile * spriteWidth,
+                        0,
+                        spriteWidth,
+                        spriteHeight,
+                        enemy.getX(),
+                        enemy.getY(),
+                        this.tileSize,
+                        this.tileSize);
+                }
                 this.bufferCtx.drawImage(this.tilesetMap,
                     tile * spriteWidth,
                     0,
@@ -148,4 +210,15 @@ export class WorldView extends State {
         this.drawMap();
         this.drawPlayer();
     }
+
+    // Getter & Setter
+
+    getLevelMap() {
+        return this.levelMap;
+    }
+
+    setLevelMapValue(posY: number, posX: number, value: number) {
+        this.levelMap[posY][posX] = value;
+    }
+
 }
