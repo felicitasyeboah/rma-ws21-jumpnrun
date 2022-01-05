@@ -112,6 +112,14 @@ export class GameObject {
         return this.y;
     }
 
+    setX(value: number) {
+        this.x = value;
+    }
+
+    setY(value: number) {
+        this.y = value;
+    }
+
     setJumping(pressed: boolean) {
         this.jumping = pressed;
     }
@@ -138,32 +146,37 @@ export class GameObject {
 }
 
 class GameItem extends GameObject {
-    private image: any;
+    protected image: any;
     protected gameModel: GameModel;
+    private _type: string;
 
-    constructor(gameModel: GameModel, x: number, y: number, w: number, h: number) {
+    constructor(gameModel: GameModel, x: number, y: number, w: number, h: number, type: string) {
         super(gameModel, x, y, h, w)
         this.gameModel = gameModel;
         this.image = undefined;
+        this._type = type;
     }
 
+    get type(): string {
+        return this._type;
+    }
 }
 
 export class Water extends GameItem {
-    constructor(gameModel: GameModel, x: number, y: number, w: number, h: number) {
-        super(gameModel, x, y, w, h);
+    constructor(gameModel: GameModel, x: number, y: number, w: number, h: number, type: string) {
+        super(gameModel, x, y, w, h, type);
     }
 }
 
 export class Coin extends GameItem {
-    constructor(gameModel: GameModel, x: number, y: number, w: number, h: number) {
-        super(gameModel, x, y, w, h);
+    constructor(gameModel: GameModel, x: number, y: number, w: number, h: number, type: string) {
+        super(gameModel, x, y, w, h, type);
     }
 }
 
 export class Exit extends GameItem {
-    constructor(gameModel: GameModel, x: number, y: number, w: number, h: number) {
-        super(gameModel, x, y, w, h);
+    constructor(gameModel: GameModel, x: number, y: number, w: number, h: number, type: string) {
+        super(gameModel, x, y, w, h, type);
     }
 }
 
@@ -174,8 +187,8 @@ class MovingItem extends GameItem {
     moveDirection: number;
     moveCounter: number
 
-    constructor(gameModel: GameModel, x: number, y: number, w: number, h: number) {
-        super(gameModel, x, y, w, h);
+    constructor(gameModel: GameModel, x: number, y: number, w: number, h: number, type: string) {
+        super(gameModel, x, y, w, h, type);
         this.moveDirection = 1; // 1 = nach rechts, -1 = nach links
         this.moveCounter = 0;
     }
@@ -185,21 +198,21 @@ class MovingItem extends GameItem {
  * Gegnerobjekt, das sich bewegt.
  */
 export class Enemy extends MovingItem {
-    constructor(gameModel: GameModel, x: number, y: number, w: number, h: number, private moveX: number, private moveY: number) {
-        super(gameModel, x, y, w, h);
-        this.moveX = moveX;
-        this.moveY = moveY;
+    constructor(gameModel: GameModel, x: number, y: number, w: number, h: number, type: string) {
+        super(gameModel, x, y, w, h, type);
     }
 
+
     //kann auch Updatefunktion werden
-    move() {
+    update() {
         this.x += this.moveDirection;
         this.moveCounter++;
-        if (this.moveCounter > 50) {
+        if (this.moveCounter > this.gameModel.canvasData.TILE_SIZE) {
             this.moveDirection *= -1;
             this.moveCounter *= -1;
         }
     }
+
 }
 
 /**
@@ -208,19 +221,19 @@ export class Enemy extends MovingItem {
 export class MovingPlatform extends MovingItem {
     private moveX: number; // 1 = gesetzt (bewegt sich), 0 = ungesetzt(bewegt sich nicht)
     private moveY: number; // 1 = gesetzt (bewegt sich), 0 = ungesetzt(bewegt sich nicht)
-    constructor(gameModel: GameModel, x: number, y: number, w: number, h: number, moveX: number, moveY: number) {
-        super(gameModel, x, y, w, h);
+    constructor(gameModel: GameModel, x: number, y: number, w: number, h: number, moveX: number, moveY: number, type: string) {
+        super(gameModel, x, y, w, h, type);
         this.moveX = moveX;
         this.moveY = moveY;
 
     }
 
     //kann auch Updatefunktion werden
-    move() {
+    update() {
         this.x += this.moveDirection * this.moveX;
         this.y += this.moveDirection * this.moveY;
         this.moveCounter++;
-        if (this.moveCounter > 50) {
+        if (this.moveCounter > this.gameModel.canvasData.TILE_SIZE) {
             this.moveDirection *= -1;
             this.moveCounter *= -1;
         }

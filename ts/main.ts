@@ -60,6 +60,7 @@ export type keyState = {
     jump: boolean,
 }
 let collisionMapData = {}; //cmd;
+let spriteData = {};
 let tileMapLevelData: { [key: string]: number[][] } = {};
 let worldImages: { [key: string]: string } = {};
 
@@ -70,16 +71,18 @@ function loadEntities() {
     preload.addEventListener("complete", startGame);
     preload.loadManifest(([
         // Tilemapdaten Laden aus CSV-Dateien
-        {id: "level1", src: "map_data/tilemap_level1.csv", group: "this.tileMapLevelData"},
-        {id: "level2", src: "map_data/tilemap_level2.csv", group: "this.tileMapLevelData"},
-        {id: "level3", src: "map_data/tilemap_level3.csv", group: "this.tileMapLevelData"},
-        {id: "level4", src: "map_data/tilemap_level4.csv", group: "this.tileMapLevelData"},
-        {id: "level5", src: "map_data/tilemap_level5.csv", group: "this.tileMapLevelData"},
-        {id: "level6", src: "map_data/tilemap_level6.csv", group: "this.tileMapLevelData"},
-        {id: "level7", src: "map_data/tilemap_level7.csv", group: "this.tileMapLevelData"},
+        {id: "level1", src: "map_data/tilemap_level1.csv", group: "tileMapLevelData"},
+        {id: "level2", src: "map_data/tilemap_level2.csv", group: "tileMapLevelData"},
+        {id: "level3", src: "map_data/tilemap_level3.csv", group: "tileMapLevelData"},
+        {id: "level4", src: "map_data/tilemap_level4.csv", group: "tileMapLevelData"},
+        {id: "level5", src: "map_data/tilemap_level5.csv", group: "tileMapLevelData"},
+        {id: "level6", src: "map_data/tilemap_level6.csv", group: "tileMapLevelData"},
+        {id: "level7", src: "map_data/tilemap_level7.csv", group: "tileMapLevelData"},
 
         //Load CollisionmapData aus JSON File
-        {id: "collisionMapData", src: "map_data/collisionMapData.json", group: "this.tileMapLevelData"},
+        {id: "collisionMapData", src: "map_data/collisionMapData.json", group: "tileMapLevelData"},
+        {id: "spriteData", src: "map_data/sprites.json", group: "tileMapLevelData"},
+
         // Bilder Laden:
         // Player Spritesheet
         {id: "tilesetPlayer", src: "img/player_sprite.png"},
@@ -110,9 +113,15 @@ function handleFileload(event: Event) {
     }
     if (event.item.type === "image") {
         worldImages[event.item.id] = event.result;
+        console.log(worldImages);
     }
     if (event.item.type === "json") {
-        collisionMapData = event.result;
+        if (event.item.id == "collisionMapData") {
+            collisionMapData = event.result;
+        }
+        if (event.item.id == "spriteData") {
+            spriteData = event.result;
+        }
     }
 }
 
@@ -121,7 +130,7 @@ function handleFileload(event: Event) {
  */
 function startGame() {
     /* Model */
-    const gameModel = new GameModel(CANVAS_DATA, tileMapLevelData, worldImages, collisionMapData);
+    const gameModel = new GameModel(CANVAS_DATA, tileMapLevelData, worldImages, collisionMapData, spriteData);
 
     /* Views */
     const STATE_DATA = {

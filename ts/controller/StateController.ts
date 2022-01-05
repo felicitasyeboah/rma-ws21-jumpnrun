@@ -24,7 +24,7 @@ export default class StateController {
         this.stateName = gameModel.getStartStateName();
         this.gameModel = gameModel;
         this.state = this.stateData[this.stateName]; //Es wird eine der View-Objekte zugewiesen (world, startmenue etc.)
-        this.worldController = new WorldController(this.gameModel, this.state);
+        this.worldController = new WorldController(gameModel, this.state);
         this.state.startup();
         this._registerEvents();
         this._handleResize(); // First draw

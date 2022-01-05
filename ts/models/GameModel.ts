@@ -1,25 +1,31 @@
 import {Player} from "./objects/Player.js"
 import {Canvasdata, keyState} from "../main.js";
+import {Coin, Enemy, MovingPlatform} from "./objects/GameObject";
 
 /**
  * Das GameModel hält alle Daten der Applikation
  */
 export class GameModel {
     private readonly startStateName: string;
-    player: Player;
+    private player: Player;
     deltatime: number;
     friction: number;
     gravity: number;
     keyState: keyState;
     private currentLevel: number;
     private readonly maxLevel: number;
+    private levelMap: number[][];
+    private enemies: Enemy[];
+    private platforms: MovingPlatform[];
+    private coins: Coin[];
+    spriteData: {};
 
-    constructor(readonly canvasData: Canvasdata, public tileMapLevelData: {}, public worldImages: { [key: string]: string }, public collisionMapData: { [key: string]: number[] }) {
+    constructor(readonly canvasData: Canvasdata, public tileMapLevelData: {}, public worldImages: { [key: string]: string }, public collisionMapData: { [key: string]: number[] }, spriteData: {}) {
         this.deltatime = 0;
         this.startStateName = 'worldView';
         this.currentLevel = 1;
         this.maxLevel = 3;
-
+        this.levelMap = [];
         this.gravity = 4;
         this.friction = 0.4;
         this.keyState = {
@@ -28,6 +34,10 @@ export class GameModel {
             jump: false,
         };
         this.player = new Player(this, 0, 0, 0, 0);
+        this.enemies = [];
+        this.platforms = [];
+        this.coins = [];
+        this.spriteData = spriteData;
     }
 
     getHighscore() {
@@ -76,5 +86,45 @@ export class GameModel {
 
     setGravity(value: number) {
         this.gravity = value;
+    }
+
+    getEnemies() {
+        return this.enemies;
+    }
+
+    setEnemies(value: Enemy[]) {
+        this.enemies = value;
+    }
+
+    getPlatforms() {
+        return this.platforms;
+    }
+
+    setPlatforms(value: MovingPlatform []) {
+        this.platforms = value;
+    }
+
+    getCoins() {
+        return this.coins;
+    }
+
+    setCoins(value: Coin[]) {
+        this.coins = value;
+    }
+
+    getLevelMap() {
+        return this.levelMap;
+    }
+
+    setLevelMap(value: number[][]) {
+        this.levelMap = value;
+    }
+
+    getPlayer() {
+        return this.player;
+    }
+
+    setPlayer(value: Player) {
+        this.player = value;
     }
 }

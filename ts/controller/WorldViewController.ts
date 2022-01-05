@@ -15,14 +15,17 @@ export class WorldController {
     private rightTile: number;
     private bottomTile: number;
     private leftTile: number;
-    private levelMap: any;
+    private tileMapLevelData: any;
+    private gameModel: any;
+    private tilesetMap: any;
 
-    constructor(private gameModel: GameModel, private worldView: WorldView) {
+    constructor(gameModel: GameModel, private worldView: WorldView) {
+        this.gameModel = gameModel;
         this.canvasData = gameModel.canvasData;
-        this.player = gameModel.player;
+        this.player = gameModel.getPlayer();
         this.collisionMapData = gameModel.collisionMapData;
-        this.levelMap = this.worldView.getLevelMap;
-
+        this.tileMapLevelData = gameModel.tileMapLevelData;
+        this.tilesetMap = gameModel.worldImages["tilesetMap"]
         this.topTile = 0;
         this.rightTile = 0;
         this.bottomTile = 0;
@@ -37,12 +40,20 @@ export class WorldController {
         console.log(nextLevel);
         if (nextLevel <= this.gameModel.getMaxLevel()) {
             this.gameModel.setCurrentLevel(nextLevel);
-            this.player.resetPlayerPos();
+            this.resetLevelData();
             this.worldView.initLevel();
         } else {
             //TODO: Ende des Spiels, Highscore/Score anzeigen
             console.log("maximales level erreicht");
         }
+    }
+
+    resetLevelData() {
+        this.player.resetPlayerPos();
+        this.worldView.cleanup();
+        this.gameModel.setCoins([]);
+        this.gameModel.setEnemies([]);
+        this.gameModel.setPlatforms([]);
     }
 
     /**
@@ -242,12 +253,36 @@ export class WorldController {
     }
 
     collideCoin(object: GameObject, tileX: number, tileY: number) {
-        this.worldView.setLevelMapValue(tileY, tileX, 99);
+        console.log("collided with coin");
+        console.log(tileY, tileX);
+        let counter = 0;
+        this.gameModel.getCoins().forEach((coin: { getX: () => number; getY: () => number; }) => {
+            if ((coin.getX() == tileX * this.canvasData.TILE_SIZE + 9) && (coin.getY() == tileY * this.canvasData.TILE_SIZE)) {
+                this.gameModel.getCoins().splice(counter, 1);
+                this.gameModel.setCoins(this.gameModel.getCoins());
+            }
+            counter++;
+        });
     }
 
-    // Updated die Daten der View
+    collideEnemy() {
+        this.gameModel.getEnemies().forEach((enemy: { x: number; xOld: number; }) => {
+            if (enemy.x < this.player.getX() && enemy.xOld > this.player.getOldLeft()) {
+
+            }
+        })
+    }
+
+    // Updated die Daten für die View
     update() {
         this.player.update();
         this.handleCollisionObject(this.player);
+        this.gameModel.getEnemies().forEach(function (enemy: { update: () => void; }) {
+            enemy.update();
+        });
+        this.gameModel.getPlatforms().forEach((platform: { update: () => void; }) => platform.update());
+        //enemy: { update: () => any; }) => enemy.update());
+
+
     }
 }
