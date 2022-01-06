@@ -89,12 +89,14 @@ export class Player extends GameObject {
      * Updated den Spieler
      */
     update() {
-        if (!this.jumping) {
+        if (!this.inTheAir) {
             this.xVelocity *= this.friction;
         } else {
             this.yVelocity += this.gravity;
+            //this.yVelocity *= this.friction;
+
         }
-        this.jumping = true;
+        this.inTheAir = true;
         this.move();
         this.xOld = this.x;
         this.yOld = this.y;
