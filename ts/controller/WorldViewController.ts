@@ -1,7 +1,7 @@
 import {GameModel} from "../models/GameModel.js";
 import {Player} from "../models/objects/Player.js";
 import {Canvasdata} from "../main.js";
-import {GameObject} from "../models/objects/GameObject.js";
+import {Enemy, GameObject, MovingPlatform} from "../models/objects/GameObject.js";
 import {WorldView} from "../views/WorldView.js";
 
 /**
@@ -57,12 +57,12 @@ export class WorldController {
     }
 
     /**
-     * Kollisionsbehandlung eines Objekts mit Hindernissen und der Ganvasbegrenzung
+     * Kollisionsbehandlung eines Objekts mit statischen Hindernissen und der Ganvasbegrenzung
      * @param object
      */
     handleCollisionObject(object: GameObject) {
         // Collision-Handling zur Collision mit der Canvasbegrenzung
-        //linke Seite des canvas
+        // linke Seite des canvas
         if (object.getLeft() < 0) {
             object.setLeft(0)
         }
@@ -76,15 +76,15 @@ export class WorldController {
         }
         // untere Seite des canvas
         if (object.getBottom() > this.canvasData.GAME_HEIGHT) {
-            object.setJumping(false);
+            object.setInTheAir(false);
             object.setBottom(this.canvasData.GAME_HEIGHT);
         }
 
-        //Collision-Handling zur Collision mit einem Item/Tile innerhalb der Map
+        // Collision-Handling zur Collision mit einem Item/Tile innerhalb der Map
         this.locateCollisionTiles(object);
     }
 
-    //Localization function - auf was für Tiles (topLeft, topRight, bottomLeft, bottomRight)
+    // Localization function - auf was für Tiles (topLeft, topRight, bottomLeft, bottomRight)
     // befindet sich das Object aktuell
     locateCollisionTiles(object: GameObject) {
         let value;
@@ -130,7 +130,7 @@ export class WorldController {
         return this.collisionMapData["level" + this.gameModel.getCurrentLevel()][this.bottomTile * this.canvasData.COLS + this.rightTile];
     }
 
-    //routing function - zuordnen des Collision-Tile zu der entsprechenden Collision-function
+    // routing function - zuordnen des Collision-Tile zu der entsprechenden Collision-function
     routeCollisionTile(value: number, object: GameObject, tileX: number, tileY: number) {
         // 11 = c_left, 12 = c_top, 13 = c_right, 14 = c_bottom,
         // 21 = c_top_left, 22 = c_top_right, 23 = c_top_left_right
@@ -208,7 +208,7 @@ export class WorldController {
     }
 
 
-    //Response Functions - Auf die Collission reagieren und Objektposition anpassen
+    // Response Functions - Auf die Collission reagieren und Objektposition anpassen
     collidePlatformBottom(object: GameObject, tileBottom: number) {
         if (object.getTop() < tileBottom && object.getOldTop() >= tileBottom) {
             object.setTop(tileBottom);
@@ -220,7 +220,6 @@ export class WorldController {
     }
 
     collidePlatformLeft(object: GameObject, tileLeft: number) {
-
         if (object.getRight() > tileLeft && object.getOldRight() <= tileLeft) {
             object.setRight(tileLeft - 0.05);
             object.setXVelocity(0);
@@ -245,7 +244,7 @@ export class WorldController {
     collidePlatformTop(object: GameObject, tileTop: number) {
         if (object.getBottom() > tileTop && object.getOldBottom() <= tileTop) {
             object.setBottom(tileTop - 0.05);
-            object.setJumping(false);
+            object.setInTheAir(false);
             return true;
         } else {
             return false;
@@ -253,11 +252,10 @@ export class WorldController {
     }
 
     collideCoin(object: GameObject, tileX: number, tileY: number) {
-        console.log("collided with coin");
-        console.log(tileY, tileX);
         let counter = 0;
         this.gameModel.getCoins().forEach((coin: { getX: () => number; getY: () => number; }) => {
-            if ((coin.getX() == tileX * this.canvasData.TILE_SIZE + 9) && (coin.getY() == tileY * this.canvasData.TILE_SIZE)) {
+            if (coin.getX() == tileX * this.canvasData.TILE_SIZE + (this.canvasData.TILE_SIZE/2 - this.gameModel.spriteData["coin"].w /4)
+                && (coin.getY() == tileY * this.canvasData.TILE_SIZE)) {
                 this.gameModel.getCoins().splice(counter, 1);
                 this.gameModel.setCoins(this.gameModel.getCoins());
             }
@@ -265,22 +263,44 @@ export class WorldController {
         });
     }
 
-    collideEnemy() {
-        this.gameModel.getEnemies().forEach((enemy: { x: number; xOld: number; }) => {
-            if (enemy.x < this.player.getX() && enemy.xOld > this.player.getOldLeft()) {
+    // collideEnemy() {
+    //     this.gameModel.getEnemies().forEach((enemy: { x: number; xOld: number; }) => {
+    //         if (enemy.x < this.player.getX() && enemy.xOld > this.player.getOldLeft()) {
+    //             this.player.setPlayerX(this.player.getX());
+    //             this.player.setXVelocity(0);
+    //         }
+    //     })
+    //}
+    collideMovingPlatform(object: GameObject, movingPlatform: MovingPlatform) {
+        if (object.getTop() > movingPlatform.getBottom() ||
+            object.getBottom() < movingPlatform.getTop() ||
+            object.getRight() < movingPlatform.getLeft() ||
+            object.getLeft() > movingPlatform.getRight()) {
+                return false;
+        }
+        if(movingPlatform.type == "platform") {
+            object.setBottom(movingPlatform.getTop());
+        }
+        if (movingPlatform.type == "platform_topping") {
+            object.setBottom(movingPlatform.getTop());
+            object.setX(object.getX()+movingPlatform.moveDirection);
+        }
+        object.setInTheAir(false);
 
-            }
-        })
     }
+
 
     // Updated die Daten für die View
     update() {
         this.player.update();
         this.handleCollisionObject(this.player);
-        this.gameModel.getEnemies().forEach(function (enemy: { update: () => void; }) {
+        this.gameModel.getEnemies().forEach(function (enemy: Enemy) {
             enemy.update();
         });
-        this.gameModel.getPlatforms().forEach((platform: { update: () => void; }) => platform.update());
+        this.gameModel.getPlatforms().forEach((platform: MovingPlatform) => {
+            platform.update();
+            this.collideMovingPlatform(this.player, platform);
+        });
         //enemy: { update: () => any; }) => enemy.update());
 
 
