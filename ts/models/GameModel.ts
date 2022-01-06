@@ -1,6 +1,6 @@
 import {Player} from "./objects/Player.js"
 import {Canvasdata, keyState} from "../main.js";
-import {Coin, Enemy, MovingPlatform} from "./objects/GameObject";
+import {SpriteGroup} from "./objects/SpriteGroup.js";
 
 /**
  * Das GameModel hält alle Daten der Applikation
@@ -15,9 +15,10 @@ export class GameModel {
     private currentLevel: number;
     private readonly maxLevel: number;
     private levelMap: number[][];
-    private enemies: Enemy[];
-    private platforms: MovingPlatform[];
-    private coins: Coin[];
+    private enemyGroup: SpriteGroup;
+    private platformGroup: SpriteGroup;
+    private coinGroup: SpriteGroup;
+    private waterGroup: SpriteGroup;
     spriteData: {};
 
     constructor(readonly canvasData: Canvasdata, public tileMapLevelData: {}, public worldImages: { [key: string]: string }, public collisionMapData: { [key: string]: number[] }, spriteData: {}) {
@@ -34,9 +35,10 @@ export class GameModel {
             jump: false,
         };
         this.player = new Player(this, 0, 0, 0, 0);
-        this.enemies = [];
-        this.platforms = [];
-        this.coins = [];
+        this.enemyGroup = new SpriteGroup();
+        this.platformGroup = new SpriteGroup();
+        this.coinGroup = new SpriteGroup();
+        this.waterGroup = new SpriteGroup();
         this.spriteData = spriteData;
     }
 
@@ -88,28 +90,34 @@ export class GameModel {
         this.gravity = value;
     }
 
-    getEnemies() {
-        return this.enemies;
+    getEnemyGroup() {
+        return this.enemyGroup;
     }
 
-    setEnemies(value: Enemy[]) {
-        this.enemies = value;
+    setEnemyGroup(value: SpriteGroup) {
+        this.enemyGroup = value;
     }
 
-    getPlatforms() {
-        return this.platforms;
+    getPlatformGroup() {
+        return this.platformGroup;
     }
 
-    setPlatforms(value: MovingPlatform []) {
-        this.platforms = value;
+    setPlatformGroup(value: SpriteGroup) {
+        this.platformGroup = value;
     }
 
-    getCoins() {
-        return this.coins;
+    getCoinGroup() {
+        return this.coinGroup;
     }
 
-    setCoins(value: Coin[]) {
-        this.coins = value;
+    setCoinGroup(value: SpriteGroup) {
+        this.coinGroup = value;
+    }
+    getWaterGroup() {
+        return this.waterGroup;
+    }
+    setWaterGroup(value: SpriteGroup) {
+        this.waterGroup = value;
     }
 
     getLevelMap() {

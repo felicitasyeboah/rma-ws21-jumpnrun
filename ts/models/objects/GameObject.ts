@@ -24,7 +24,9 @@ export class GameObject {
         this.xVelocity = 0;
         this.yVelocity = 0;
     }
-
+    update() {
+        // to be overriden
+    }
     // Getters and Setters
     getLeft() {
         return this.x;
