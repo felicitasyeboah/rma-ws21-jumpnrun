@@ -18,6 +18,7 @@ export class Player extends GameObject {
     private jumpHeight: number;
     private friction: number;
     private gravity: number;
+    private alive: boolean;
 
     keyState: keyState;
 
@@ -44,6 +45,7 @@ export class Player extends GameObject {
 
         this.friction = gameModel.friction;
         this.gravity = gameModel.gravity;
+        this.alive = true;
 
         this.jumpHeight = -28;
     }
@@ -85,17 +87,40 @@ export class Player extends GameObject {
         // }
     }
 
+    died() {
+        console.log("died");
+        this.alive = false;
+        this.xVelocity = 0;
+        this.yVelocity *= -1;
+        this.gravity = 0;
+        this.friction = 0;
+        this.y += this.yVelocity; // oder in die udpate methode, bei not alive
+
+
+        //TODO: restart button azeigen oder highscore, wenn player keien leben mehr hat
+        //TODO: player image gegen ghost austauschen
+
+
+    }
+
     /**
      * Updated den Spieler
      */
     update() {
+
         if (!this.inTheAir) {
             this.xVelocity *= this.friction;
         } else {
             this.yVelocity += this.gravity;
             //this.yVelocity *= this.friction;
-
         }
+
+        if((!this.alive)) {
+            if(this.y <= 96) {
+                this.yVelocity = 0;
+                this.y = 96;
+            }
+         }
         this.inTheAir = true;
         this.move();
         this.xOld = this.x;
@@ -165,4 +190,11 @@ export class Player extends GameObject {
     getMaxTileY() {
         return this.maxTileY;
     }
+    getAlive() {
+        return this.alive;
+    }
+    setALive(value: boolean) {
+        this.alive = value;
+    }
+
 }

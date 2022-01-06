@@ -1,7 +1,8 @@
 import {State} from './State.js';
 import {GameModel} from "../models/GameModel.js";
 import {Player} from "../models/objects/Player.js";
-import {Coin, Enemy, MovingPlatform} from "../models/objects/GameObject.js";
+import {Coin, Enemy, MovingPlatform, Water} from "../models/objects/GameObject.js";
+import {SpriteGroup} from "../models/objects/SpriteGroup";
 
 /**
  * Erstellt ein WorldView Objekt. Die WorldView stellt die Spielewelt dar.
@@ -13,6 +14,10 @@ export class WorldView extends State {
     private levelMap: number[][];
     private _tileList: any;
     private spriteData: any;
+    private enemyGroup: SpriteGroup;
+    private coinGroup: SpriteGroup;
+    private platformGroup: SpriteGroup;
+    private waterGroup: SpriteGroup;
 
 
     constructor(private gameModel: GameModel) {
@@ -25,7 +30,10 @@ export class WorldView extends State {
         this.tilesetMap = gameModel.worldImages["tilesetMap"];
         this._tileList = [];
         this.spriteData = gameModel.spriteData;
-
+        this.enemyGroup = gameModel.getEnemyGroup();
+        this.coinGroup = gameModel.getCoinGroup();
+        this.platformGroup = gameModel.getPlatformGroup();
+        this.waterGroup = gameModel.getWaterGroup();
 
     }
 
@@ -92,46 +100,43 @@ export class WorldView extends State {
                         this.tileSize,
                         this.tileSize / this.spriteData["slime"].w * this.spriteData["slime"].h,
                         "slime")
-                    this.gameModel.getEnemies().push(slime);
-                    this.gameModel.setEnemies(this.gameModel.getEnemies());
+                    this.enemyGroup.add(slime);
                 }
                 // Platform mit streuseln
                 if (tile == 3) {
 
                     let platform = new MovingPlatform(this.gameModel, col * this.tileSize, row * this.tileSize, this.tileSize,
                         this.tileSize / this.spriteData["platform_topping"].w * this.spriteData["platform_topping"].h, 1, 0, "platform_topping");
-                    this.gameModel.getPlatforms().push(platform);
-                    this.gameModel.setPlatforms(this.gameModel.getPlatforms());
+                    this.platformGroup.add(platform);
                 }
                 // tile 4  = plattform ohne streusel
                 if (tile == 4) {
                     let platform = new MovingPlatform(this.gameModel, col * this.tileSize, row * this.tileSize, this.tileSize,
                         this.tileSize / this.spriteData["platform"].w * this.spriteData["platform"].h, 0, 1, "platform");
-                    this.gameModel.getPlatforms().push(platform);
-                    this.gameModel.setPlatforms(this.gameModel.getPlatforms());
+                    this.platformGroup.add(platform);
                 }
 
                 // tile 5 = water
                 if (tile == 5) {
-                    this._tileList.push({
-                        type: "water",
-                        dx: col * this.tileSize,
-                        dy: row * this.tileSize + this.tileSize - this.tileSize / this.spriteData["water"].w * this.spriteData["water"].h,
-                        dw: this.tileSize,
-                        dh: this.tileSize / this.spriteData["water"].w * this.spriteData["water"].h,
-                    });
+                    let water = new Water(
+                        this.gameModel,
+                        col * this.tileSize,
+                        row * this.tileSize + this.tileSize - this.tileSize / this.spriteData["water"].w * this.spriteData["water"].h,
+                        this.tileSize,
+                        this.tileSize / this.spriteData["water"].w * this.spriteData["water"].h,
+                        "water");
+                    this.waterGroup.add(water);
                 }
 
                 // TILE 6 = COIN
                 if (tile == 6) {
                     let coin = new Coin(this.gameModel,
-                        col * this.tileSize + (this.tileSize/2) - this.spriteData["coin"].w /4,
+                        col * this.tileSize + (this.tileSize / 2) - this.spriteData["coin"].w / 4,
                         row * this.tileSize,
-                        this.spriteData["coin"].w /2,
-                        this.spriteData["coin"].h/2,
+                        this.spriteData["coin"].w / 2,
+                        this.spriteData["coin"].h / 2,
                         "coin");
-                    this.gameModel.getCoins().push(coin);
-                    this.gameModel.setCoins(this.gameModel.getCoins());
+                    this.coinGroup.add(coin);
                 }
 
                 // TILE 7 = EXIT
@@ -215,7 +220,20 @@ export class WorldView extends State {
     }
 
     private drawEntities() {
-        this.gameModel.getEnemies().forEach(enemy => (
+        this.waterGroup.getSprites().forEach((water: Water) => {
+            this.bufferCtx.drawImage(
+                this.tilesetMap,
+                this.spriteData[water.type].x,
+                this.spriteData[water.type].y,
+                this.spriteData[water.type].w,
+                this.spriteData[water.type].h,
+                water.getX(),
+                water.getY(),
+                water.getW(),
+                water.getH()
+            )
+        });
+        this.enemyGroup.getSprites().forEach((enemy: Enemy) => (
             this.bufferCtx.drawImage(
                 this.tilesetMap,
                 this.spriteData[enemy.type].x,
@@ -228,7 +246,7 @@ export class WorldView extends State {
                 enemy.getH()
             )
         ));
-        this.gameModel.getPlatforms().forEach(platform => (
+        this.platformGroup.getSprites().forEach((platform: MovingPlatform) => (
             this.bufferCtx.drawImage(
                 this.tilesetMap,
                 this.spriteData[platform.type].x,
@@ -241,7 +259,7 @@ export class WorldView extends State {
                 platform.getH()
             )
         ));
-        this.gameModel.getCoins().forEach(coin => (
+        this.coinGroup.getSprites().forEach((coin: Coin) => (
             this.bufferCtx.drawImage(
                 this.tilesetMap,
                 this.spriteData[coin.type].x,
@@ -252,7 +270,7 @@ export class WorldView extends State {
                 coin.getY(),
                 coin.getW(),
                 coin.getH()
-            )))
+            )));
     }
 
     //TODO: Frage: Eventhandling auslagern in Controller?
@@ -293,7 +311,6 @@ export class WorldView extends State {
         // }
     }
 
-
     /**
      * Redraws the View
      */
@@ -301,12 +318,11 @@ export class WorldView extends State {
         this.bufferCtx.clearRect(0, 0, this.gameWidth, this.gameHeight);
         this.displayCtx.clearRect(0, 0, this.displayCanvas.width, this.displayCanvas.height);
         this.drawMap();
-        this.drawEntities();
         this.drawPlayer();
+        this.drawEntities();
     }
 
     // Getter & Setter
-
     get tileList(): any {
         return this._tileList;
     }

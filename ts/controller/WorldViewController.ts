@@ -1,8 +1,9 @@
 import {GameModel} from "../models/GameModel.js";
 import {Player} from "../models/objects/Player.js";
 import {Canvasdata} from "../main.js";
-import {Enemy, GameObject, MovingPlatform} from "../models/objects/GameObject.js";
+import {Coin, Enemy, GameObject, MovingPlatform, Water} from "../models/objects/GameObject.js";
 import {WorldView} from "../views/WorldView.js";
+import {SpriteGroup} from "../models/objects/SpriteGroup.js";
 
 /**
  * Der WoldController verwaltet und updated die Daten der WorldView
@@ -18,6 +19,10 @@ export class WorldController {
     private tileMapLevelData: any;
     private gameModel: any;
     private tilesetMap: any;
+    private enemyGroup: SpriteGroup;
+    private platformGroup: SpriteGroup;
+    private coinGroup: SpriteGroup;
+    private waterGroup: SpriteGroup;
 
     constructor(gameModel: GameModel, private worldView: WorldView) {
         this.gameModel = gameModel;
@@ -30,6 +35,11 @@ export class WorldController {
         this.rightTile = 0;
         this.bottomTile = 0;
         this.leftTile = 0;
+        this.enemyGroup = gameModel.getEnemyGroup();
+        this.platformGroup = gameModel.getPlatformGroup();
+        this.coinGroup = gameModel.getCoinGroup();
+        this.waterGroup = gameModel.getWaterGroup();
+
     }
 
     /**
@@ -51,9 +61,10 @@ export class WorldController {
     resetLevelData() {
         this.player.resetPlayerPos();
         this.worldView.cleanup();
-        this.gameModel.setCoins([]);
-        this.gameModel.setEnemies([]);
-        this.gameModel.setPlatforms([]);
+        this.coinGroup.setSprites([]);
+        this.enemyGroup.setSprites([]);
+        this.platformGroup.setSprites([]);
+        this.waterGroup.setSprites([]);
     }
 
     /**
@@ -80,7 +91,7 @@ export class WorldController {
             object.setBottom(this.canvasData.GAME_HEIGHT);
         }
 
-        // Collision-Handling zur Collision mit einem Item/Tile innerhalb der Map
+        // Tilebased-Collision-Detection: Collision-Handling zur Collision mit einem Tile innerhalb der CollisionMap
         this.locateCollisionTiles(object);
     }
 
@@ -187,7 +198,6 @@ export class WorldController {
                 break;
             case 41: //41 = top_left_right_bottom
                 if (this.collidePlatformRight(object, rightTileX)) return;
-
                 if (this.collidePlatformBottom(object, bottomTileY)) return;
                 if (this.collidePlatformTop(object, topTileY)) return;
                 this.collidePlatformLeft(object, leftTileX);
@@ -198,7 +208,7 @@ export class WorldController {
             case 52: // 52 = c_water
                 break;
             case 53: // 53 = c_coin
-                this.collideCoin(object, tileX, tileY);
+                //this.collideCoin(object, tileX, tileY);
                 break;
             case 54: // 54 = c_enemy wohl ueberfluessaig, da sich alle bwegen werden
                 break;
@@ -223,7 +233,6 @@ export class WorldController {
         if (object.getRight() > tileLeft && object.getOldRight() <= tileLeft) {
             object.setRight(tileLeft - 0.05);
             object.setXVelocity(0);
-            console.log(tileLeft);
             return true;
         } else {
             return false;
@@ -234,7 +243,6 @@ export class WorldController {
         if (object.getLeft() < tileRight && object.getOldLeft() >= tileRight) {
             object.setLeft(tileRight);
             object.setXVelocity(0);
-            console.log("tileright", tileRight);
             return true;
         } else {
             return false;
@@ -251,58 +259,104 @@ export class WorldController {
         }
     }
 
-    collideCoin(object: GameObject, tileX: number, tileY: number) {
-        let counter = 0;
-        this.gameModel.getCoins().forEach((coin: { getX: () => number; getY: () => number; }) => {
-            if (coin.getX() == tileX * this.canvasData.TILE_SIZE + (this.canvasData.TILE_SIZE/2 - this.gameModel.spriteData["coin"].w /4)
-                && (coin.getY() == tileY * this.canvasData.TILE_SIZE)) {
-                this.gameModel.getCoins().splice(counter, 1);
-                this.gameModel.setCoins(this.gameModel.getCoins());
+    // collideCoin(object: GameObject, tileX: number, tileY: number) {
+    //     let counter = 0;
+    //     this.gameModel.getCoins().forEach((coin: { getX: () => number; getY: () => number; }) => {
+    //         if (coin.getX() == tileX * this.canvasData.TILE_SIZE + (this.canvasData.TILE_SIZE/2 - this.gameModel.spriteData["coin"].w /4)
+    //             && (coin.getY() == tileY * this.canvasData.TILE_SIZE)) {
+    //             this.gameModel.getCoins().splice(counter, 1);
+    //             this.gameModel.setCoins(this.gameModel.getCoins());
+    //         }
+    //         counter++;
+    //     });
+    //}
+    collideCoin(object: GameObject, coin: Coin) {
+        if (this.player.getLeft() < coin.getRight() &&
+            this.player.getRight() > coin.getLeft() &&
+            this.player.getBottom() > coin.getTop() &&
+            this.player.getTop() < coin.getBottom()) {
+            return true;
+        }
+        return false;
+    }
+
+    collideEnemy(object: GameObject, enemy: Enemy) {
+            if (this.player.getLeft() < enemy.getRight() &&
+                this.player.getRight() > enemy.getLeft() &&
+                this.player.getTop() < enemy.getBottom() &&
+                this.player.getBottom() > enemy.getTop()) {
+                return true;
             }
-            counter++;
+            return false;
+    }
+
+    collideMovingPlatform(object: GameObject, movingPlatform: MovingPlatform) {
+        if (object.getTop() < movingPlatform.getBottom() &&
+            object.getBottom() > movingPlatform.getTop() &&
+            object.getRight() > movingPlatform.getLeft() &&
+            object.getLeft() < movingPlatform.getRight()) {
+            return true;
+        }
+        return false;
+    }
+
+    collideWater(object: GameObject, water: Water) {
+        if(this.player.getLeft() < water.getRight() &&
+            this.player.getRight() > water.getLeft() &&
+            this.player.getTop() < water.getBottom() &&
+            this.player.getBottom() > water.getTop()) {
+            return true;
+        }
+        return false;
+    }
+
+    //TODO: pixelcollisiondetection veralggemienern für alle objecte nicht nur für den player
+    //Pixelbased Collision-Detection: Collision-Handling zur Collision mit einem GameObject
+    checkCollision() {
+        this.enemyGroup.getSprites().forEach((enemy: Enemy) => {
+            enemy.update();
+            if (this.collideEnemy(this.player, enemy)) {
+                this.player.died();
+            }
+        });
+        this.platformGroup.getSprites().forEach((movingPlatform: MovingPlatform) => {
+            movingPlatform.update();
+            if(this.collideMovingPlatform(this.player, movingPlatform)) {
+                if(movingPlatform.type == "platform") {
+                    this.player.setBottom(movingPlatform.getTop());
+                }
+                if (movingPlatform.type == "platform_topping") {
+                    this.player.setBottom(movingPlatform.getTop());
+                    this.player.setX(this.player.getX()+movingPlatform.moveDirection);
+                }
+                this.player.setInTheAir(false);
+            }
+        });
+        let coinArrIndex = 0;
+        this.coinGroup.getSprites().forEach((coin: Coin) => {
+            if (this.collideCoin(this.player, coin)) {
+                this.coinGroup.delete(coin);
+            }
+            coinArrIndex++;
+        });
+        this.waterGroup.getSprites().forEach((water: Water) => {
+            if (this.collideWater(this.player, water)) {
+                this.player.died();
+            }
         });
     }
-
-    // collideEnemy() {
-    //     this.gameModel.getEnemies().forEach((enemy: { x: number; xOld: number; }) => {
-    //         if (enemy.x < this.player.getX() && enemy.xOld > this.player.getOldLeft()) {
-    //             this.player.setPlayerX(this.player.getX());
-    //             this.player.setXVelocity(0);
-    //         }
-    //     })
-    //}
-    collideMovingPlatform(object: GameObject, movingPlatform: MovingPlatform) {
-        if (object.getTop() > movingPlatform.getBottom() ||
-            object.getBottom() < movingPlatform.getTop() ||
-            object.getRight() < movingPlatform.getLeft() ||
-            object.getLeft() > movingPlatform.getRight()) {
-                return false;
-        }
-        if(movingPlatform.type == "platform") {
-            object.setBottom(movingPlatform.getTop());
-        }
-        if (movingPlatform.type == "platform_topping") {
-            object.setBottom(movingPlatform.getTop());
-            object.setX(object.getX()+movingPlatform.moveDirection);
-        }
-        object.setInTheAir(false);
-
-    }
-
 
     // Updated die Daten für die View
     update() {
-        this.player.update();
-        this.handleCollisionObject(this.player);
-        this.gameModel.getEnemies().forEach(function (enemy: Enemy) {
-            enemy.update();
-        });
-        this.gameModel.getPlatforms().forEach((platform: MovingPlatform) => {
-            platform.update();
-            this.collideMovingPlatform(this.player, platform);
-        });
-        //enemy: { update: () => any; }) => enemy.update());
+        if(this.player.getAlive()) {
+            this.player.update();
+            this.handleCollisionObject(this.player);
+            this.checkCollision();
 
-
+        }
+        // wenn der spieler ein leben verloren hat, nur playe rupdaten, alles andere ist angehalten
+        else {
+            this.player.update();
+        }
     }
 }
