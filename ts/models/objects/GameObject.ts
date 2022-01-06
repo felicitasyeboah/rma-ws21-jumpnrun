@@ -8,7 +8,7 @@ export class GameObject {
     protected w: number;
     protected h: number;
     protected gameModel: GameModel;
-    protected jumping: boolean;
+    protected inTheAir: boolean;
     protected xVelocity: number;
     protected yVelocity: number;
 
@@ -20,10 +20,9 @@ export class GameObject {
         this.yOld = y;
         this.w = width;
         this.h = height;
-        this.jumping = true;
+        this.inTheAir = true;
         this.xVelocity = 0;
         this.yVelocity = 0;
-
     }
 
     // Getters and Setters
@@ -37,10 +36,6 @@ export class GameObject {
 
     getTop() {
         return this.y;
-    }
-
-    getTopRight() {
-        return
     }
 
     getBottom() {
@@ -120,12 +115,12 @@ export class GameObject {
         this.y = value;
     }
 
-    setJumping(pressed: boolean) {
-        this.jumping = pressed;
+    setInTheAir(pressed: boolean) {
+        this.inTheAir = pressed;
     }
 
-    getJumping() {
-        return this.jumping;
+    getInTheAir() {
+        return this.inTheAir;
     }
 
     getYVelocity() {
@@ -146,14 +141,12 @@ export class GameObject {
 }
 
 class GameItem extends GameObject {
-    protected image: any;
     protected gameModel: GameModel;
     private _type: string;
 
     constructor(gameModel: GameModel, x: number, y: number, w: number, h: number, type: string) {
         super(gameModel, x, y, h, w)
         this.gameModel = gameModel;
-        this.image = undefined;
         this._type = type;
     }
 
