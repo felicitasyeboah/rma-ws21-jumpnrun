@@ -81,14 +81,14 @@ function loadEntities() {
 
         //Load CollisionmapData aus JSON File
         {id: "collisionMapData", src: "map_data/collisionMapData.json", group: "tileMapLevelData"},
-        {id: "spriteData", src: "map_data/sprites.json", group: "tileMapLevelData"},
+        {id: "spriteData", src: "map_data/sprite_Data.json", group: "tileMapLevelData"},
 
         // Bilder Laden:
         // Player Spritesheet
         {id: "tilesetPlayer", src: "img/player_sprite.png"},
 
         // Tilemap-Sheet
-        {id: "tilesetMap", src: "img/tileset_map.png"},
+        {id: "tilesetMap", src: "img/tileset_64x512.png"},
 
 
         //TODO: // Sounds laden
