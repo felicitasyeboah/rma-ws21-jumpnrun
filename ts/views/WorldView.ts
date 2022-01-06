@@ -102,13 +102,6 @@ export class WorldView extends State {
                         this.tileSize / this.spriteData["platform_topping"].w * this.spriteData["platform_topping"].h, 1, 0, "platform_topping");
                     this.gameModel.getPlatforms().push(platform);
                     this.gameModel.setPlatforms(this.gameModel.getPlatforms());
-                    // this.tileList.push({
-                    //     type: "platform_topping",
-                    //     dx: col * this.tileSize,
-                    //     dy: row * this.tileSize,
-                    //     dw: this.tileSize,
-                    //     dh: this.tileSize / this.spriteData["platform_topping"].w * this.spriteData["platform_topping"].h,
-                    // });
                 }
                 // tile 4  = plattform ohne streusel
                 if (tile == 4) {
@@ -131,9 +124,12 @@ export class WorldView extends State {
 
                 // TILE 6 = COIN
                 if (tile == 6) {
-
-                    let coin = new Coin(this.gameModel, col * this.tileSize + 9, row * this.tileSize, this.tileSize / 2,
-                        this.tileSize / 2, "coin");
+                    let coin = new Coin(this.gameModel,
+                        col * this.tileSize + (this.tileSize/2) - this.spriteData["coin"].w /4,
+                        row * this.tileSize,
+                        this.spriteData["coin"].w /2,
+                        this.spriteData["coin"].h/2,
+                        "coin");
                     this.gameModel.getCoins().push(coin);
                     this.gameModel.setCoins(this.gameModel.getCoins());
                 }
@@ -273,7 +269,7 @@ export class WorldView extends State {
                 this.gameModel.keyState.right = true;
             }
             if (State.KEY.JUMP.includes(event.key)) {
-                if (!this.player.getJumping() && !this.gameModel.keyState.jump) {
+                if (!this.player.getInTheAir() && !this.gameModel.keyState.jump) {
                     this.gameModel.keyState.jump = true;
                     this.player.setYVelocity(this.player.getJumpHeight());
                 }
