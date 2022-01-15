@@ -1,8 +1,8 @@
 import {State} from './State.js';
 import {GameModel} from "../models/GameModel.js";
 import {Player} from "../models/objects/Player.js";
-import {Coin, Enemy, MovingPlatform, Water} from "../models/objects/GameObject.js";
-import {SpriteGroup} from "../models/objects/SpriteGroup";
+import {Coin, Enemy, GameItem, MovingPlatform, Water} from "../models/objects/GameObject.js";
+import {SpriteGroup} from "../models/objects/SpriteGroup.js";
 
 /**
  * Erstellt ein WorldView Objekt. Die WorldView stellt die Spielewelt dar.
@@ -11,6 +11,7 @@ export class WorldView extends State {
     private tileMapLevelData: any;
     private player: Player;
     private tilesetMap: any;
+    private bgImage: any;
     private levelMap: number[][];
     private _tileList: any;
     private spriteData: any;
@@ -18,23 +19,33 @@ export class WorldView extends State {
     private coinGroup: SpriteGroup;
     private platformGroup: SpriteGroup;
     private waterGroup: SpriteGroup;
+    private heartGroup: SpriteGroup;
+    private hudCtx: CanvasRenderingContext2D;
+    private _timeToFinishLevel: number;
+    levelTimer: number;
+    private paused: boolean;
 
 
     constructor(private gameModel: GameModel) {
         super(gameModel.canvasData);
-        this.gameModel = gameModel;
+        this.next = "startMenu";
+        this.hudCtx = gameModel.canvasData.HUD_CTX;
         this.tileMapLevelData = gameModel.tileMapLevelData;
-
+        this._timeToFinishLevel = 100; // in seconds
         this.player = gameModel.getPlayer();
         this.levelMap = [];
         this.tilesetMap = gameModel.worldImages["tilesetMap"];
+        this.bgImage = gameModel.worldImages["background"];
         this._tileList = [];
         this.spriteData = gameModel.spriteData;
         this.enemyGroup = gameModel.getEnemyGroup();
         this.coinGroup = gameModel.getCoinGroup();
         this.platformGroup = gameModel.getPlatformGroup();
         this.waterGroup = gameModel.getWaterGroup();
+        this.heartGroup = gameModel.getHeartGroup();
+        this.levelTimer = 0;
 
+        this.paused = false;
     }
 
     /**
@@ -48,17 +59,41 @@ export class WorldView extends State {
     }
 
     cleanup() {
+        this.stopLevelTimer(this.levelTimer);
         this.levelMap = [];
         this._tileList = [];
+        this.coinGroup.setSprites([]);
+        this.enemyGroup.setSprites([]);
+        this.platformGroup.setSprites([]);
+        this.waterGroup.setSprites([]);
+        this.heartGroup.setSprites([]);
     }
 
     /**
      * Initiert das jeweilige Level
      */
     initLevel() {
+        this._timeToFinishLevel = 100;
         this.loadMap();
+        this.drawBackground();
+        this.initHud();
         this.drawMap();
+        this.drawEntities();
         this.drawPlayer();
+        this.setLevelTimer();
+    }
+
+    setLevelTimer() {
+        this.levelTimer = setInterval(() => {
+            this._timeToFinishLevel -= 1;
+            if (this._timeToFinishLevel <= 0) {
+                this.stopLevelTimer(this.levelTimer);
+            }
+        }, 1000);
+    }
+
+    stopLevelTimer(timer: number | undefined) {
+        clearInterval(timer);
     }
 
     /**
@@ -153,15 +188,81 @@ export class WorldView extends State {
         }
     }
 
+    // Init HUD
+    private initHud() {
+        let spacing = 3;
+        // HUD Coin Count
+        let hudCoin = new Coin(this.gameModel,
+            this.tileSize * 12.5,
+            43,
+            this.spriteData["coin"].w / 2,
+            this.spriteData["coin"].h / 2,
+            "coin");
+        this.coinGroup.add(hudCoin);
+
+        // HUD Life count
+        let hudHeartFull1L = new GameItem(this.gameModel,
+            this.tileSize * 3.5,
+            42,
+            this.spriteData["heart_full"].w / 1.5,
+            this.spriteData["heart_full"].h / 1.5,
+            "heart_full");
+
+        let hudHeartFull2L = new GameItem(this.gameModel,
+            hudHeartFull1L.getX() + hudHeartFull1L.getW() + spacing,
+            42,
+            this.spriteData["heart_full"].w / 1.5,
+            this.spriteData["heart_full"].h / 1.5,
+            "heart_full");
+        let hudHeartFull3L = new GameItem(this.gameModel,
+            hudHeartFull2L.getX() + hudHeartFull2L.getW() + spacing,
+            42,
+            this.spriteData["heart_full"].w / 1.5,
+            this.spriteData["heart_full"].h / 1.5,
+            "heart_full");
+        let hudHeart1L = new GameItem(this.gameModel,
+            this.tileSize * 3.5,
+            42,
+            this.spriteData["heart_empty"].w / 1.5,
+            this.spriteData["heart_empty"].h / 1.5,
+            "heart_empty");
+        let hudHeart2L = new GameItem(this.gameModel,
+            hudHeart1L.getX() + hudHeart1L.getW() + spacing,
+            42,
+            this.spriteData["heart_empty"].w / 1.5,
+            this.spriteData["heart_empty"].h / 1.5,
+            "heart_empty");
+        let hudHeart3L = new GameItem(this.gameModel,
+            hudHeart2L.getX() + hudHeart2L.getW() + spacing,
+            42,
+            this.spriteData["heart_empty"].w / 1.5,
+            this.spriteData["heart_empty"].h / 1.5,
+            "heart_empty");
+
+        this.heartGroup.add(hudHeart1L);
+        this.heartGroup.add(hudHeart2L);
+        this.heartGroup.add(hudHeart3L);
+        if (this.player.getLifeCounter() == 1 || this.player.getLifeCounter() == 2 || this.player.getLifeCounter() == 3) {
+            this.heartGroup.add(hudHeartFull1L);
+        }
+        if (this.player.getLifeCounter() == 2 || this.player.getLifeCounter() == 3) {
+            this.heartGroup.add(hudHeartFull2L);
+        }
+        if (this.player.getLifeCounter() == 3) {
+            this.heartGroup.add(hudHeartFull3L);
+        }
+    }
+
+    private drawBackground() {
+        this.bufferCtx.drawImage(this.bgImage, 0, 0, this.CANVAS_DATA.GAME_WIDTH, this.CANVAS_DATA.GAME_HEIGHT);
+    }
+
     /**
      * Zeichnet die Map
      * @private
      */
     private drawMap() {
         for (let tile of this._tileList) {
-            let spritesInTileMap = 8;
-            let spriteWidth = this.tilesetMap.width / spritesInTileMap;
-            let spriteHeight = this.tilesetMap.height;
             this.bufferCtx.drawImage(
                 this.tilesetMap,
                 this.spriteData[tile.type].x,
@@ -188,7 +289,6 @@ export class WorldView extends State {
 
         }
     }
-
 
     /**
      * zeichnet den Player
@@ -271,60 +371,65 @@ export class WorldView extends State {
                 coin.getW(),
                 coin.getH()
             )));
+
+        this.heartGroup.getSprites().forEach((heart: GameItem) => (
+            this.bufferCtx.drawImage(
+                this.tilesetMap,
+                this.spriteData[heart.type].x,
+                this.spriteData[heart.type].y,
+                this.spriteData[heart.type].w,
+                this.spriteData[heart.type].h,
+                heart.getX(),
+                heart.getY(),
+                heart.getW(),
+                heart.getH()
+            )));
     }
 
-    //TODO: Frage: Eventhandling auslagern in Controller?
-    /**
-     * Prueft die Tasteneingaben in der WorldView
-     * @param event
-     */
-    getEvent(event: any): void {
-        if (event.type === "keydown") {
-            if (State.KEY.LEFT.includes(event.key)) {
-                this.gameModel.keyState.left = true;
-            }
-            if (State.KEY.RIGHT.includes(event.key)) {
-                this.gameModel.keyState.right = true;
-            }
-            if (State.KEY.JUMP.includes(event.key)) {
-                if (!this.player.getInTheAir() && !this.gameModel.keyState.jump) {
-                    this.gameModel.keyState.jump = true;
-                    this.player.setYVelocity(this.player.getJumpHeight());
-                }
-            }
-        }
-        if (event.type === "keyup") {
-            if (State.KEY.LEFT.includes(event.key)) {
-                this.gameModel.keyState.left = false;
-            } else if (State.KEY.RIGHT.includes(event.key)) {
-                this.gameModel.keyState.right = false;
-            } else if (State.KEY.JUMP.includes(event.key)) {
-                this.gameModel.keyState.jump = false;
-            }
-        }
-        // if (State.KEY.RIGHT.includes(event.key)) {
-        //     this.player.move("right");
-        // } else if (State.KEY.LEFT.includes(event.key)) {
-        //     this.player.move("left");
-        // } else if (State.KEY.JUMP.includes(event.key)) {
-        //     this.player.move("jump");
-        // }
+    drawHud() {
+        this.hudCtx.font = "1.2em 'Press Start 2P', cursive";
+        this.hudCtx.fillStyle = "#ffffff";
+        this.hudCtx.fillText(
+            "x" + this.player.getCoinCounter(),
+            this.tileSize * 13,
+            55);
+        this.hudCtx.fillText(
+            "LIVES", this.tileSize * 1.5,
+            55);
+        this.hudCtx.fillText(
+            "LEVEL " + this.gameModel.getCurrentLevel() + "/" + this.gameModel.getMaxLevel(),
+            this.tileSize * 7,
+            55);
+
+        this.hudCtx.fillText("TIME " + this._timeToFinishLevel.toString(), this.tileSize * 15.5, 55)
+        this.bufferCtx.drawImage(this.gameModel.canvasData.HUD_CANVAS, 0, 0);
+
     }
 
     /**
      * Redraws the View
      */
     update() {
+        this.hudCtx.clearRect(0, 0, this.gameWidth, this.hudCtx.canvas.height);
         this.bufferCtx.clearRect(0, 0, this.gameWidth, this.gameHeight);
         this.displayCtx.clearRect(0, 0, this.displayCanvas.width, this.displayCanvas.height);
+        this.drawBackground();
         this.drawMap();
-        this.drawPlayer();
         this.drawEntities();
+        this.drawHud();
+        this.drawPlayer();
     }
 
-    // Getter & Setter
+// Getter & Setter
     get tileList(): any {
         return this._tileList;
     }
 
+    get timeToFinishLevel(): number {
+        return this._timeToFinishLevel;
+    }
+
+    set timeToFinishLevel(value: number) {
+        this._timeToFinishLevel = value;
+    }
 }

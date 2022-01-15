@@ -6,22 +6,28 @@
     <meta name="description" content="2D Game">
     <meta name="author" content="Felicitas Yeboah">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
     <link rel="stylesheet" type="text/css" href="css/styles.css" media="screen"/>
     <title>Jump n Run - Felicitas Yeboah</title>
 </head>
 <body>
-<canvas id="gameCanvas">Ihr Browser unterstuetzt kein Canvas Element.</canvas>
-
+<canvas id="gameCanvas">Dein Browser unterstuetzt kein Canvas Element.</canvas>
+<div id="pause">
+    <span class="font-pause">*PAUSED*</span>
+    <button class="btn btn-resume">RESUME</button>
+</div>
 
 <script type="importmap" defer>
 {
   "imports": {
-    "createjs-module": "/node_modules/createjs-module/createjs.js"
+    "createjs-module": "./node_modules/createjs-module/createjs.js"
   }
 }
 </script>
+<script src="./lib/preloadjs.js" defer></script>
 <script src="js/main.js" type="module" defer></script>
-<script src="/lib/createjs.js" defer></script>
 </body>
 
 </html>
