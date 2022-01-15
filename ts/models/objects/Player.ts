@@ -19,6 +19,8 @@ export class Player extends GameObject {
     private friction: number;
     private gravity: number;
     private alive: boolean;
+    private lifeCounter: number;
+    private coinCounter: number;
 
     keyState: keyState;
 
@@ -41,13 +43,16 @@ export class Player extends GameObject {
         this.w = 24;
         this.h = 24; // / this.spriteWidth * this.spriteHeight
         this.x = 35;
-        this.y = 512; //gameModel.canvasData.CANVAS_HEIGHT - gameModel.canvasData.TILE_SIZE - this.h;
+        this.y = 212; //gameModel.canvasData.CANVAS_HEIGHT - gameModel.canvasData.TILE_SIZE - this.h;
 
         this.friction = gameModel.friction;
         this.gravity = gameModel.gravity;
-        this.alive = true;
 
-        this.jumpHeight = -28;
+        this.alive = true;
+        this.lifeCounter = 3;
+        this.coinCounter = 0;
+
+        this.jumpHeight = -17;
     }
 
     resetPlayerPos() {
@@ -61,10 +66,10 @@ export class Player extends GameObject {
     move(/*playerDirection: string*/) {
 
         if (this.keyState.left) {
-            this.xVelocity = -6;
+            this.xVelocity = -5;
         }
         if (this.keyState.right) {
-            this.xVelocity = 6;
+            this.xVelocity = 5;
         }
 
         // switch (playerDirection) {
@@ -95,32 +100,43 @@ export class Player extends GameObject {
         this.gravity = 0;
         this.friction = 0;
         this.y += this.yVelocity; // oder in die udpate methode, bei not alive
-
-
-        //TODO: restart button azeigen oder highscore, wenn player keien leben mehr hat
-        //TODO: player image gegen ghost austauschen
-
-
+        this.lifeCounter--;
+        switch (this.getLifeCounter()) {
+            case 0:
+                this.gameModel.getHeartGroup().delete(this.gameModel.getHeartGroup().getSprites()[length - 3]);
+                break;
+            case 1:
+                this.gameModel.getHeartGroup().delete(this.gameModel.getHeartGroup().getSprites()[length - 2]);
+                break;
+            case 2:
+                this.gameModel.getHeartGroup().delete(this.gameModel.getHeartGroup().getSprites()[length - 1]);
+                break;
+        }
+        if (this.getLifeCounter() == 0) {
+            console.log("GameOver");
+        }
     }
 
     /**
      * Updated den Spieler
      */
     update() {
-
         if (!this.inTheAir) {
             this.xVelocity *= this.friction;
         } else {
             this.yVelocity += this.gravity;
-            //this.yVelocity *= this.friction;
+            //this.xVelocity *= this.friction;
+            //  this.yVelocity *= this.friction;
         }
 
         if((!this.alive)) {
             if(this.y <= 96) {
                 this.yVelocity = 0;
                 this.y = 96;
+                this.xVelocity = 0;
             }
          }
+
         this.inTheAir = true;
         this.move();
         this.xOld = this.x;
@@ -193,8 +209,20 @@ export class Player extends GameObject {
     getAlive() {
         return this.alive;
     }
-    setALive(value: boolean) {
+    setAlive(value: boolean) {
         this.alive = value;
     }
+    getCoinCounter() {
+        return this.coinCounter;
+    }
 
+    setCoinCounter(value: number) {
+        this.coinCounter = value;
+    }
+    getLifeCounter() {
+        return this.lifeCounter;
+    }
+    setLifeCounter(value: number) {
+        this.lifeCounter = value;
+    }
 }
