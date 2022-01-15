@@ -6,7 +6,17 @@ import {SpriteGroup} from "./objects/SpriteGroup.js";
  * Das GameModel hält alle Daten der Applikation
  */
 export class GameModel {
-    private readonly startStateName: string;
+    //TODO: FRAGE: soll ein statisches Attribut sein, oder besser im Constructo???
+    public static KEY = {
+        LEFT: ['ArrowLeft', 'a'],
+        RIGHT: ['ArrowRight', 'd'],
+        JUMP: [' ', 'w', 'ArrowUp'],
+        UP: ['ArrowUp', 'w'],
+        DOWN: ['ArrowDown', 's'],
+        PAUSE: ['Escape', 'esc', 'ESC', 'Esc', 'p', 'P'],
+        ENTER: ['Enter']
+    }
+
     private player: Player;
     deltatime: number;
     friction: number;
@@ -19,27 +29,35 @@ export class GameModel {
     private platformGroup: SpriteGroup;
     private coinGroup: SpriteGroup;
     private waterGroup: SpriteGroup;
+    private heartGroup: SpriteGroup;
+
     spriteData: {};
+    private _backgroundImage: ImageBitmap;
 
     constructor(readonly canvasData: Canvasdata, public tileMapLevelData: {}, public worldImages: { [key: string]: string }, public collisionMapData: { [key: string]: number[] }, spriteData: {}) {
         this.deltatime = 0;
-        this.startStateName = 'worldView';
         this.currentLevel = 1;
         this.maxLevel = 3;
         this.levelMap = [];
-        this.gravity = 4;
-        this.friction = 0.4;
+        this.gravity = 2.5;
+        this.friction = 0.6; // oder 0.4 / 0.55 mit
         this.keyState = {
             right: false,
             left: false,
             jump: false,
+            up: false,
+            down: false,
+            pause: false,
+            enter: false
         };
         this.player = new Player(this, 0, 0, 0, 0);
         this.enemyGroup = new SpriteGroup();
         this.platformGroup = new SpriteGroup();
         this.coinGroup = new SpriteGroup();
         this.waterGroup = new SpriteGroup();
+        this.heartGroup = new SpriteGroup();
         this.spriteData = spriteData;
+        this._backgroundImage = worldImages['background'] as unknown as ImageBitmap;
     }
 
     getHighscore() {
@@ -48,10 +66,6 @@ export class GameModel {
 
     setHighscore(name: string, punkte: number) {
         console.log("Name: " + name, "Punkte: " + punkte);
-    }
-
-    getStartStateName() {
-        return this.startStateName;
     }
 
     getDeltatime() {
@@ -119,7 +133,12 @@ export class GameModel {
     setWaterGroup(value: SpriteGroup) {
         this.waterGroup = value;
     }
-
+    getHeartGroup() {
+        return this.heartGroup;
+    }
+    setHeartGroup(value: SpriteGroup) {
+        this.heartGroup = value;
+    }
     getLevelMap() {
         return this.levelMap;
     }
@@ -134,5 +153,10 @@ export class GameModel {
 
     setPlayer(value: Player) {
         this.player = value;
+    }
+
+
+    get backgroundImage(): ImageBitmap {
+        return this._backgroundImage;
     }
 }
