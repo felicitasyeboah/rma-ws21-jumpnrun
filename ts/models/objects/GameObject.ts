@@ -24,6 +24,7 @@ export class GameObject {
         this.xVelocity = 0;
         this.yVelocity = 0;
     }
+
     update() {
         // to be overriden
     }
@@ -142,10 +143,8 @@ export class GameObject {
     }
 }
 
-class GameItem extends GameObject {
-    protected gameModel: GameModel;
+export class GameItem extends GameObject {
     private _type: string;
-
     constructor(gameModel: GameModel, x: number, y: number, w: number, h: number, type: string) {
         super(gameModel, x, y, h, w)
         this.gameModel = gameModel;
@@ -164,6 +163,12 @@ export class Water extends GameItem {
 }
 
 export class Coin extends GameItem {
+    constructor(gameModel: GameModel, x: number, y: number, w: number, h: number, type: string) {
+        super(gameModel, x, y, w, h, type);
+    }
+}
+
+export class Heart extends GameItem {
     constructor(gameModel: GameModel, x: number, y: number, w: number, h: number, type: string) {
         super(gameModel, x, y, w, h, type);
     }
