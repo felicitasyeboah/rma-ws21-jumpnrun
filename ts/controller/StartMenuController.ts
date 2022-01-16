@@ -92,12 +92,15 @@ export class StartMenuController extends StateController {
     handleSelectedButton(btn: Button) {
         btn.bodyColor = undefined;
         switch (btn.name) {
-            case 'start_game':
+            case 'world':
+                this.view.next = btn.name;
                 this.view.done = true;
                 break;
             case 'highscore':
                 this.view.next = btn.name;
                 console.log('highscore switch case');
+                this.view.done = true;
+
                 break;
             case 'instruction':
                 this.view.next = btn.name;

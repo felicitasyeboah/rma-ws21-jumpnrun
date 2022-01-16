@@ -28,7 +28,7 @@ export default class StartMenuView extends State {
     }
     private _initButtons() {
         this._btnStartGame = new Button(
-            'start_game',
+            'world',
             this.buttonWidth,
             this.buttonHeight,
             6,
