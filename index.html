@@ -15,10 +15,14 @@
 <body>
 <canvas id="gameCanvas">Dein Browser unterstuetzt kein Canvas Element.</canvas>
 <div id="pause">
-    <span class="font-pause">*PAUSED*</span>
+    <div class="font-pause">Game Paused</div>
     <button class="btn btn-resume">RESUME</button>
 </div>
-
+<div id="restart">
+    <div class="font-restart">You died!</div>
+    <button class="btn btn-restart">RESTART LEVEL</button>
+    <button class="btn btn-quit">QUIT GAME</button>
+</div>
 <script type="importmap" defer>
 {
   "imports": {

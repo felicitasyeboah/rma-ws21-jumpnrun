@@ -24,7 +24,7 @@ export class WorldController extends StateController {
     private coinGroup: SpriteGroup;
     private waterGroup: SpriteGroup;
     private heartGroup: SpriteGroup;
-    private coinCounter: number;
+   // private coinCounter: number;
 
     constructor(gameModel: GameModel, private worldView: WorldView) {
         super(gameModel, worldView);
@@ -41,7 +41,6 @@ export class WorldController extends StateController {
         this.platformGroup = gameModel.getPlatformGroup();
         this.coinGroup = gameModel.getCoinGroup();
         this.waterGroup = gameModel.getWaterGroup();
-        this.coinCounter = gameModel.getPlayer().getCoinCounter();
         this.heartGroup = gameModel.getHeartGroup();
     }
 
@@ -88,8 +87,22 @@ export class WorldController extends StateController {
                 this.resumeState();
             }
         }
+        // Pause-Fenster: wenn auf den Reume Button geclickt wird -> resume Game
         if (event.type == "click" && event.target.className == "btn btn-resume" && this.gameModel.keyState.pause) {
             this.resumeState();
+        }
+        // Restart-Fenster: wenn auf den Restart-Button geclickt wird -> restart Level
+        if((event.target.className == "btn btn-restart" && GameModel.KEY.ENTER.includes((event.key))) ||
+            (event.type == "click" && event.target.className == "btn btn-restart")) {
+            this.restartLevel();
+        }
+        // Restart-Fenster: wenn auf den Quit-Button geclickt wird -> Quit Game (zurueck zum Hauptmenue)
+        if((event.target.className == "btn btn-quit" && GameModel.KEY.ENTER.includes((event.key))) ||
+            (event.type == "click" && event.target.className == "btn btn-quit")) {
+            this.worldView.done = true;
+            this.gameModel.canvasData.DIV_RESTART.style.display = "none";
+            this.player.reset();
+
         }
 
         // if (State.KEY.RIGHT.includes(event.key)) {
@@ -103,6 +116,7 @@ export class WorldController extends StateController {
 
     // Updated die Daten für die View
     update() {
+
         if (this.player.getAlive()) {
             {
                 this.player.update();
@@ -114,21 +128,16 @@ export class WorldController extends StateController {
         // wenn der spieler ein leben verloren hat, nur playe rupdaten, alles andere ist angehalten
         else {
             this.player.update();
-            // switch (this.player.getLifeCounter()) {
-            //     case 0:
-            //         this.gameModel.getHeartGroup().delete(this.gameModel.getHeartGroup().getSprites()[length - 3]);
-            //         break;
-            //     case 1:
-            //         this.gameModel.getHeartGroup().delete(this.gameModel.getHeartGroup().getSprites()[length - 2]);
-            //         break;
-            //     case 2:
-            //         this.gameModel.getHeartGroup().delete(this.gameModel.getHeartGroup().getSprites()[length - 1]);
-            //         break;
-            // }
-            // if (this.player.getLifeCounter() == 0) {
-            //     console.log("GameOver");
-            // }
-            //TODO: restart button azeigen oder highscore, wenn player keien leben mehr hat
+
+            // wenn Spieler keine Leben mehr hat
+            if (this.player.getLifeCounter() == 0) {
+                console.log("GameOver");
+            } else {
+                // wenn Spieler noch leben uebrig hat
+                this.showRestartBtn();
+            }
+
+            //TODO: highscore, wenn player keien leben mehr hat
             //TODO: player image gegen ghost austauschen
 
         }
@@ -150,25 +159,37 @@ export class WorldController extends StateController {
         }
     }
 
+    // Setzt die Leveldaten zurueck vor Eintritt ins das naechste Level
     resetLevelData() {
         this.player.resetPlayerPos();
         this.worldView.cleanup();
     }
 
+    // setzt das Spiel fort, nachdem es pausiert wurde
     private resumeState() {
         this.gameModel.keyState.pause = false;
         this.gameModel.canvasData.DIV_PAUSE.style.display = "none";
         this.worldView.setLevelTimer();
     }
-
-
+    // Pausiert das Spiel
     private pauseState() {
         this.gameModel.keyState.pause = true;
         this.gameModel.canvasData.DIV_PAUSE.style.display = "flex";
         this.worldView.stopLevelTimer(this.worldView.levelTimer);
 
     }
-
+    // setzt den Spieler wieder am Anfang des Levels beginnen, nachdem er gestorben ist und noch Leben uebrig hat
+    private restartLevel() {
+        this.gameModel.canvasData.DIV_RESTART.style.display = "none";
+        this.player.reborn();
+        this.worldView.setLevelTimer();
+    }
+    // blendet das RestartMenu mit Quit und Restart Game Button ein, wenn der Spieler ein Leben verliert und noch Leben uebrig hat.
+    private showRestartBtn() {
+        this.gameModel.canvasData.DIV_RESTART.style.display = "flex";
+        this.gameModel.canvasData.DIV_RESTART.focus();
+        this.worldView.stopLevelTimer(this.worldView.levelTimer);
+    }
 
     /**
      * Kollisionsbehandlung eines Objekts mit statischen Hindernissen und der Ganvasbegrenzung
@@ -455,8 +476,7 @@ export class WorldController extends StateController {
             this.coinGroup.getSprites().forEach((coin: Coin) => {
                 if (this.collideCoin(this.player, coin)) {
                     this.coinGroup.delete(coin);
-                    this.coinCounter++;
-                    this.player.setCoinCounter(this.coinCounter);
+                    this.player.setCoinCounter(this.player.getCoinCounter()+1)
                 }
             });
             this.waterGroup.getSprites().forEach((water: Water) => {

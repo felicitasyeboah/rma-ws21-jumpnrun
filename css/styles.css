@@ -19,56 +19,51 @@ p {
     margin-left: 0.5rem;
     margin-top: 0rem;
 }
-#pause {
-    display: none;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    position:absolute;
-    background-color: #ffffff;
-    color: #373737; /*3cbfee*/
-    padding: 3% 1.5%;
-    width: fit-content;
-
-}
-#start-menu {
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    position:absolute;
-    background-color: #ffffff;
-    color: #373737; /*3cbfee*/
-    padding: 3% 1.5%;
-    width: fit-content;
-}
-.font-pause {
-    padding: 10% 10% 10%;
-    font-size:2.5vw;
-}
 button {
     width:82%;
     height:25%;
     font-family: 'Press Start 2P', cursive;
 }
+#pause, #restart {
+    display: none;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    position:absolute;
+    background-color: white;
+    opacity: 0.99;
+    color: blue; /*3cbfee #FEA443;*/
+    padding: 9% 2%;
+    width: 40%;
+    border: 7px solid white;
+
+}
+
+.font-pause, .font-restart {
+    display:inline-block;
+    padding: 0% 0% 20% 0%;
+    font-size:2.2vw;
+}
+
 .btn {
-    background-color: #26b7e3;
+    background-color: #FEA443;
     border: none;
     color: white;
-    padding: 8% 10%;
+    padding: 4% 0%;
     text-align: center;
     text-decoration: none;
     display: inline-block;
     transition-duration: 0.4s;
     cursor: pointer;
 }
-.btn-resume {
-    background-color: #3cbfee;
-    color: white;
-    border: 2px solid #14b1da;
-    font-size: 1.1vw;
+.btn-resume, .btn-restart, .btn-quit {
+    border: 7px solid white; /*#14b1da;*/
+    font-size:1.9vw;
 }
 
-.btn-resume:hover {
-    background-color: #14b1da;
+.btn-resume:hover, .btn-restart:hover, .btn-quit:hover, .btn-resume:focus, .btn-restart:focus, .btn-quit:focus {
+    background-color: white;
+    color: blue;
+    border-color: #FEA443;
+    outline: none;
 }

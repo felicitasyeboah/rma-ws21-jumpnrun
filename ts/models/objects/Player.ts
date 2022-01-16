@@ -16,8 +16,8 @@ export class Player extends GameObject {
     private maxTileX: number;
     private maxTileY: number;
     private jumpHeight: number;
-    private friction: number;
-    private gravity: number;
+    private _friction: number;
+    private _gravity: number;
     private alive: boolean;
     private lifeCounter: number;
     private coinCounter: number;
@@ -45,8 +45,8 @@ export class Player extends GameObject {
         this.x = 35;
         this.y = 212; //gameModel.canvasData.CANVAS_HEIGHT - gameModel.canvasData.TILE_SIZE - this.h;
 
-        this.friction = gameModel.friction;
-        this.gravity = gameModel.gravity;
+        this._friction = gameModel.friction;
+        this._gravity = gameModel.gravity;
 
         this.alive = true;
         this.lifeCounter = 3;
@@ -55,11 +55,26 @@ export class Player extends GameObject {
         this.jumpHeight = -17;
     }
 
-    resetPlayerPos() {
-        this.x = 35;
-        this.y = 512;
+    // Wenn setzt geaenderten Werte auf die Default-Werte zurueck
+    reset() {
+        this.reborn();
+        this.lifeCounter = 3;
+        this.coinCounter = 0;
     }
 
+    // Setzt die Playerposition auf seinen Startpunkt zurueck
+    resetPlayerPos() {
+        this.x = 35;
+        this.y = 212;
+    }
+
+    // settz Werte, die beim sterben gesetzt wurden, wieder auf default-werte zurueck und setzt den Spieler zum Startpunkt zureuck
+    reborn() {
+        this.resetPlayerPos();
+        this._gravity = 2.5;
+        this._friction = 0.6;
+        this.alive = true;
+    }
     /**
      * Bewegt den Spieler
      */
@@ -97,8 +112,8 @@ export class Player extends GameObject {
         this.alive = false;
         this.xVelocity = 0;
         this.yVelocity *= -1;
-        this.gravity = 0;
-        this.friction = 0;
+        this._gravity = 0;
+        this._friction = 0;
         this.y += this.yVelocity; // oder in die udpate methode, bei not alive
         this.lifeCounter--;
         switch (this.getLifeCounter()) {
@@ -122,9 +137,9 @@ export class Player extends GameObject {
      */
     update() {
         if (!this.inTheAir) {
-            this.xVelocity *= this.friction;
+            this.xVelocity *= this._friction;
         } else {
-            this.yVelocity += this.gravity;
+            this.yVelocity += this._gravity;
             //this.xVelocity *= this.friction;
             //  this.yVelocity *= this.friction;
         }
@@ -224,5 +239,22 @@ export class Player extends GameObject {
     }
     setLifeCounter(value: number) {
         this.lifeCounter = value;
+    }
+
+
+    get friction(): number {
+        return this._friction;
+    }
+
+    set friction(value: number) {
+        this._friction = value;
+    }
+
+    get gravity(): number {
+        return this._gravity;
+    }
+
+    set gravity(value: number) {
+        this._gravity = value;
     }
 }

@@ -23,7 +23,7 @@ export class WorldView extends State {
     private hudCtx: CanvasRenderingContext2D;
     private _timeToFinishLevel: number;
     levelTimer: number;
-    private paused: boolean;
+    public run: boolean;
 
 
     constructor(private gameModel: GameModel) {
@@ -45,7 +45,7 @@ export class WorldView extends State {
         this.heartGroup = gameModel.getHeartGroup();
         this.levelTimer = 0;
 
-        this.paused = false;
+        this.run = true;
     }
 
     /**

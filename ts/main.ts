@@ -22,6 +22,7 @@ const GAME_HEIGHT = ROWS * TILE_SIZE;
 // document.body.appendChild(P);
 
 const DIV_PAUSE = document.getElementById("pause")!;
+const DIV_RESTART = document.getElementById('restart')!;
 
 // Buffer canvas: die nativen tilemapdaten werden hier rein gezeichnet
 const BUFFER_CANVAS = document.createElement('canvas') as HTMLCanvasElement;
@@ -46,6 +47,7 @@ DISPLAY_CTX.imageSmoothingEnabled = false; // disable ImageSmoothing damit die S
 DISPLAY_CANVAS.innerText = "Ihr Browser unterstuetzt kein Canvas Element.";
 
 export type Canvasdata = {
+    DIV_RESTART: HTMLElement,
     DIV_PAUSE: HTMLElement,
     BUFFER_CANVAS: HTMLCanvasElement,
     BUFFER_CTX: CanvasRenderingContext2D,
@@ -61,6 +63,7 @@ export type Canvasdata = {
     FONT: string
 }
 export const CANVAS_DATA: Canvasdata = {
+    DIV_RESTART: DIV_RESTART,
     DIV_PAUSE: DIV_PAUSE,
     BUFFER_CANVAS: BUFFER_CANVAS,
     BUFFER_CTX: BUFFER_CTX,
