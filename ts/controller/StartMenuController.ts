@@ -9,9 +9,8 @@ import {CANVAS_DATA} from "../main.js";
     passt Daten des Models an und aktualisiert die StartMenuView
  */
 export class StartMenuController extends StateController {
-    constructor(gameModel: GameModel, private startMenuView: StartMenuView) {
-        super(gameModel, startMenuView);
-        this.gameModel = gameModel;
+    constructor(protected gameModel: GameModel, protected view: StartMenuView) {
+        super(gameModel);
     }
 
     // Verarbeitet die Maus- und Keyboard Events, die vom GameController kommen
@@ -27,7 +26,7 @@ export class StartMenuController extends StateController {
             }
             if (GameModel.KEY.ENTER.includes(event.key)) {
                 this.gameModel.keyState.enter = true;
-                this.handleSelectedButton(this.startMenuView.activeButton!);
+                this.handleSelectedButton(this.view.activeButton!);
             }
         }
         if (event.type === "keyup") {
@@ -37,7 +36,6 @@ export class StartMenuController extends StateController {
                 this.gameModel.keyState.down = false;
             } else if (GameModel.KEY.ENTER.includes(event.key)) {
                 this.gameModel.keyState.enter = false;
-                this.switchButtonDownwards();
             }
         }
         if (event.type === "click") {
@@ -54,7 +52,7 @@ export class StartMenuController extends StateController {
     // (bei resizen des Fensters, waehrend das Spiel laeuft.)
     handleButtonBoundings() {
         let t = CANVAS_DATA.DISPLAY_CANVAS.width / CANVAS_DATA.COLS;
-        this.startMenuView.buttonGroup.forEach((btn: Button) => {
+        this.view.buttonGroup.forEach((btn: Button) => {
             btn.boundingBoxWidth = t * btn.widthInCols;
             btn.boundingBoxHeight = t * btn.heightInRows;
             btn.boundingBoxX = t * btn.xInCols;
@@ -81,7 +79,7 @@ export class StartMenuController extends StateController {
     // findet den Button, auf den geklickt wurde, anhand der Mausposition
     handleClickedButton(event: Event) {
         let mousePos = this.getMousePos(this.canvasData.DISPLAY_CANVAS, event);
-        this.startMenuView.buttonGroup.forEach((btn: Button) => {
+        this.view.buttonGroup.forEach((btn: Button) => {
 
             if (this.mouseOverlapsButton(mousePos, btn)) {
                 this.handleSelectedButton(btn);
@@ -95,14 +93,14 @@ export class StartMenuController extends StateController {
         btn.bodyColor = undefined;
         switch (btn.name) {
             case 'start_game':
-                this.startMenuView.done = true;
+                this.view.done = true;
                 break;
             case 'highscore':
-                this.startMenuView.next = btn.name;
+                this.view.next = btn.name;
                 console.log('highscore switch case');
                 break;
             case 'instruction':
-                this.startMenuView.next = btn.name;
+                this.view.next = btn.name;
                 console.log('instruction switch case');
                 break;
         }
@@ -111,7 +109,7 @@ export class StartMenuController extends StateController {
     // prueft die Position der Maus und gibt bei einer Ueberlappung mit einem Button,
     handleMouseMovement(event: MouseEvent) {
         let mousePos = this.getMousePos(this.canvasData.DISPLAY_CANVAS, event);
-        this.startMenuView.buttonGroup.forEach((btn: Button) => {
+        this.view.buttonGroup.forEach((btn: Button) => {
             if (this.mouseOverlapsButton(mousePos, btn)) {
                 this.highlightButton(btn);
             }
@@ -120,7 +118,7 @@ export class StartMenuController extends StateController {
 
     // highlightet den ausgewählten button
     highlightButton(btn: Button) {
-        this.startMenuView.buttonGroup.forEach((btn: Button) => {
+        this.view.buttonGroup.forEach((btn: Button) => {
             btn.bodyColor = undefined;
             btn.alpha = 1;
             btn.fontColor = 'white';
@@ -130,25 +128,25 @@ export class StartMenuController extends StateController {
         btn.bodyColor = '#FEA443';
         btn.fontColor = 'blue';
         btn.borderColor = 'blue';
-        this.startMenuView.activeButton = btn;
+        this.view.activeButton = btn;
         console.log("overlaps", btn.name);
     }
 
     //wechselt die Buttons per Keyboard abwaerts
     switchButtonDownwards() {
         if (this.gameModel.keyState.down) {
-            switch (this.startMenuView.activeButton) {
-                case this.startMenuView.btnStartGame:
-                    this.startMenuView.activeButton = this.startMenuView.btnHighscore;
-                    this.highlightButton(this.startMenuView.btnHighscore);
+            switch (this.view.activeButton) {
+                case this.view.btnStartGame:
+                    this.view.activeButton = this.view.btnHighscore;
+                    this.highlightButton(this.view.btnHighscore);
                     break;
-                case this.startMenuView.btnHighscore:
-                    this.startMenuView.activeButton = this.startMenuView.btnInstruction;
-                    this.highlightButton(this.startMenuView.btnInstruction);
+                case this.view.btnHighscore:
+                    this.view.activeButton = this.view.btnInstruction;
+                    this.highlightButton(this.view.btnInstruction);
                     break;
-                case this.startMenuView.btnInstruction:
-                    this.startMenuView.activeButton = this.startMenuView.btnStartGame;
-                    this.highlightButton(this.startMenuView.btnStartGame);
+                case this.view.btnInstruction:
+                    this.view.activeButton = this.view.btnStartGame;
+                    this.highlightButton(this.view.btnStartGame);
                     break;
             }
         }
@@ -157,18 +155,18 @@ export class StartMenuController extends StateController {
     // wechselt die Buttons per Keyboard aufwaerts
     switchButtonUpwards() {
         if (this.gameModel.keyState.up) {
-            switch (this.startMenuView.activeButton) {
-                case this.startMenuView.btnStartGame:
-                    this.startMenuView.activeButton = this.startMenuView.btnInstruction;
-                    this.highlightButton(this.startMenuView.btnInstruction);
+            switch (this.view.activeButton) {
+                case this.view.btnStartGame:
+                    this.view.activeButton = this.view.btnInstruction;
+                    this.highlightButton(this.view.btnInstruction);
                     break;
-                case this.startMenuView.btnHighscore:
-                    this.startMenuView.activeButton = this.startMenuView.btnStartGame;
-                    this.highlightButton(this.startMenuView.btnStartGame);
+                case this.view.btnHighscore:
+                    this.view.activeButton = this.view.btnStartGame;
+                    this.highlightButton(this.view.btnStartGame);
                     break;
-                case this.startMenuView.btnInstruction:
-                    this.startMenuView.activeButton = this.startMenuView.btnHighscore;
-                    this.highlightButton(this.startMenuView.btnHighscore);
+                case this.view.btnInstruction:
+                    this.view.activeButton = this.view.btnHighscore;
+                    this.highlightButton(this.view.btnHighscore);
                     break;
             }
         }

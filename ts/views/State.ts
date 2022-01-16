@@ -1,5 +1,6 @@
 //AbstrakteKlasse
 import {Canvasdata} from "../main.js";
+import Button from "../models/Button.js";
 
 /**
  * Die Abstrakte Klasse State wird von jeder View implementiert. Sie stellt die Views dar.
@@ -15,13 +16,17 @@ export abstract class State {
     protected mapCols = this.CANVAS_DATA.COLS;
     protected tileSize = this.CANVAS_DATA.TILE_SIZE;
     protected font = this.CANVAS_DATA.FONT;
-    private _done: boolean;
-    private _next: string;
-    private _previous: string;
+    protected _activeButton: Button | undefined;
+    protected _buttonGroup: Map<string, Button>;
+    protected _done: boolean;
+    protected _previous: string;
+
+    protected abstract _next: string;
 
     protected constructor(readonly CANVAS_DATA: Canvasdata) {
+        this._buttonGroup = new Map<string, Button>();
+        this._activeButton = undefined;
         this._done = false;
-        this._next = "";
         this._previous = "";
     }
 
@@ -57,5 +62,21 @@ export abstract class State {
 
     set previous(value: string) {
         this._previous = value;
+    }
+
+    get activeButton(): Button | undefined {
+        return this._activeButton;
+    }
+
+    set activeButton(value: Button | undefined) {
+        this._activeButton = value;
+    }
+
+    get buttonGroup(): Map<string, Button> {
+        return this._buttonGroup;
+    }
+
+    set buttonGroup(value: Map<string, Button>) {
+        this._buttonGroup = value;
     }
 }

@@ -23,12 +23,12 @@ export class WorldView extends State {
     private hudCtx: CanvasRenderingContext2D;
     private _timeToFinishLevel: number;
     levelTimer: number;
-    public run: boolean;
+    protected _next: string;
 
 
     constructor(private gameModel: GameModel) {
         super(gameModel.canvasData);
-        this.next = "startMenu";
+        this._next = "startMenu";
         this.hudCtx = gameModel.canvasData.HUD_CTX;
         this.tileMapLevelData = gameModel.tileMapLevelData;
         this._timeToFinishLevel = 100; // in seconds
@@ -44,8 +44,6 @@ export class WorldView extends State {
         this.waterGroup = gameModel.getWaterGroup();
         this.heartGroup = gameModel.getHeartGroup();
         this.levelTimer = 0;
-
-        this.run = true;
     }
 
     /**
@@ -432,4 +430,6 @@ export class WorldView extends State {
     set timeToFinishLevel(value: number) {
         this._timeToFinishLevel = value;
     }
+
+
 }

@@ -4,22 +4,22 @@ import Button from "../models/Button.js";
 import {CANVAS_DATA} from "../main.js";
 
 export default class StartMenuView extends State {
+    protected _next: string;
     private buttonWidth: number;
     private buttonHeight: number;
     private _btnStartGame!: Button;
     private _btnHighscore!: Button;
     private _btnInstruction!: Button;
-    public buttonGroup: Map<string, Button>;
-    private _activeButton: Button | undefined;
 
     constructor(private gameModel: GameModel) {
         super(gameModel.canvasData);
-        this.next = "world";
+        this._next = "world";
         this.buttonWidth = 8;
         this.buttonHeight = 1.5;
         this.font = "1.4em " + CANVAS_DATA.FONT;
-        this.buttonGroup = new Map<string, Button>();
+
     }
+
 
     startup(): void {
         this._initButtons();
@@ -63,9 +63,9 @@ export default class StartMenuView extends State {
             "INSTRUCTION",
             "white");
 
-        this.buttonGroup.set(this._btnStartGame.name, this._btnStartGame);
-        this.buttonGroup.set(this._btnHighscore.name, this._btnHighscore);
-        this.buttonGroup.set(this._btnInstruction.name, this._btnInstruction);
+        this._buttonGroup.set(this._btnStartGame.name, this._btnStartGame);
+        this._buttonGroup.set(this._btnHighscore.name, this._btnHighscore);
+        this._buttonGroup.set(this._btnInstruction.name, this._btnInstruction);
         this._activeButton = this._btnStartGame;
     }
     private _drawButtons() {
@@ -128,7 +128,7 @@ export default class StartMenuView extends State {
 
     cleanup(): void {
         this.CANVAS_DATA.BUFFER_CTX.clearRect(0,0, CANVAS_DATA.BUFFER_CANVAS.width, CANVAS_DATA.BUFFER_CANVAS.height);
-        this.buttonGroup.clear();
+        this._buttonGroup.clear();
 
     }
 
@@ -164,11 +164,5 @@ export default class StartMenuView extends State {
     }
 
 
-    get activeButton(): Button | undefined {
-        return this._activeButton;
-    }
 
-    set activeButton(value: Button | undefined) {
-        this._activeButton = value;
-    }
 }

@@ -4,9 +4,9 @@ import {Canvasdata} from "../main.js";
 
 export abstract class StateController {
     readonly canvasData: Canvasdata;
-    protected constructor(protected gameModel: GameModel, protected view: State) {
+    protected abstract view: State;
+    protected constructor(protected gameModel: GameModel) {
         this.gameModel = gameModel;
-        //this.view = view;
         this.canvasData = gameModel.canvasData;
     }
 
