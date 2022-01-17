@@ -1,8 +1,8 @@
 import {GameModel} from "../models/GameModel.js";
 import {State} from "./State.js";
-import {CANVAS_DATA} from "../main.js";
+import {CANVAS_DATA} from "../game_config.js";
 import Button from "../models/Button.js";
-import {showHighScores} from "../models/Highscore.js";
+import {showHighScores} from "../highscore_utils.js";
 
 export default class HighscoreView extends State {
     protected _next: string;
@@ -23,8 +23,7 @@ export default class HighscoreView extends State {
         this._initButton();
         this._drawButton();
         CANVAS_DATA.DIV_HIGHSCORE.style.display = "flex";
-        showHighScores();
-
+        HighscoreView._displayHighScores();
     }
 
     private _initButton() {
@@ -91,6 +90,9 @@ export default class HighscoreView extends State {
         );
     }
 
+    private static _displayHighScores() {
+        showHighScores();
+    }
     cleanup(): void {
         this.CANVAS_DATA.BUFFER_CTX.clearRect(0,0, CANVAS_DATA.BUFFER_CANVAS.width, CANVAS_DATA.BUFFER_CANVAS.height);
         this._buttonGroup.clear();
