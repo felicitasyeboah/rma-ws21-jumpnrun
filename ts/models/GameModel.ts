@@ -34,7 +34,7 @@ export class GameModel {
     spriteData: {};
     private _backgroundImage: ImageBitmap;
 
-    constructor(readonly canvasData: Canvasdata, public tileMapLevelData: {}, public worldImages: { [key: string]: string }, public collisionMapData: { [key: string]: number[] }, spriteData: {}) {
+    constructor(public tileMapLevelData: {}, public worldImages: { [key: string]: string }, public collisionMapData: { [key: string]: number[] }, spriteData: {}) {
         this.deltatime = 0;
         this.currentLevel = 1;
         this.maxLevel = 3;

@@ -89,7 +89,7 @@ function handleFileload(event: Event) {
 function startGame() {
 
     /* Model */
-    const gameModel = new GameModel(CANVAS_DATA, tileMapLevelData, worldImages, collisionMapData, spriteData);
+    const gameModel = new GameModel(tileMapLevelData, worldImages, collisionMapData, spriteData);
 
     /* Views */
     const STATE_DATA = {

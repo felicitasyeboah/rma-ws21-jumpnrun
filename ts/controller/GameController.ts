@@ -79,16 +79,16 @@ export default class GameController {
 
     // skaliert den Buffercanvas auf den tatsechlichen Canvas (DISPLAY_CANVAS)
     private renderDisplay() {
-        this.gameModel.canvasData.DISPLAY_CTX.drawImage(
-            this.gameModel.canvasData.BUFFER_CANVAS,
+        CANVAS_DATA.DISPLAY_CTX.drawImage(
+            CANVAS_DATA.BUFFER_CANVAS,
             0,
             0,
-            this.gameModel.canvasData.BUFFER_CANVAS.width,
-            this.gameModel.canvasData.BUFFER_CANVAS.height,
+            CANVAS_DATA.BUFFER_CANVAS.width,
+            CANVAS_DATA.BUFFER_CANVAS.height,
             0,
             0,
-            this.gameModel.canvasData.DISPLAY_CANVAS.width,
-            this.gameModel.canvasData.DISPLAY_CANVAS.height);
+            CANVAS_DATA.DISPLAY_CANVAS.width,
+            CANVAS_DATA.DISPLAY_CANVAS.height);
     }
 
     // Passt die Groeße des Canvas beim Resizen waehrend des Spiels an die Groeße des Browserfensters an
@@ -98,18 +98,18 @@ export default class GameController {
         let width = document.documentElement.clientWidth;
 
         // Canvas-Breite proportional zur Breite des Browserfesnters berechnen
-        this.gameModel.canvasData.DISPLAY_CANVAS.width = Math.floor(width / this.gameModel.canvasData.TILE_SIZE) * this.gameModel.canvasData.TILE_SIZE;
+        CANVAS_DATA.DISPLAY_CANVAS.width = Math.floor(width / CANVAS_DATA.TILE_SIZE) * CANVAS_DATA.TILE_SIZE;
 
         // wenn der Canvas danach breiter ist als der Browser hoch,
         // dann wird die Breite des Canvas noch proportional an die Hoehe des Fensters angepasst.
-        if (this.gameModel.canvasData.DISPLAY_CANVAS.width > height) {
-            this.gameModel.canvasData.DISPLAY_CANVAS.width = Math.floor(height / this.gameModel.canvasData.TILE_SIZE) * this.gameModel.canvasData.TILE_SIZE;
+        if (CANVAS_DATA.DISPLAY_CANVAS.width > height) {
+            CANVAS_DATA.DISPLAY_CANVAS.width = Math.floor(height / CANVAS_DATA.TILE_SIZE) * CANVAS_DATA.TILE_SIZE;
         }
         /* Berechnung proportionalen Höhe nicht noetig, da dieser Canvas quadtratisch ist.....
-        this.gameModel.canvasData.DISPLAY_CANVAS.height = this.gameModel.canvasData.DISPLAY_CANVAS.width * (this.gameModel.canvasData.GAME_HEIGHT / this.gameModel.canvasData.GAME_WIDTH);
+        CANVAS_DATA.DISPLAY_CANVAS.height = CANVAS_DATA.DISPLAY_CANVAS.width * (CANVAS_DATA.GAME_HEIGHT / CANVAS_DATA.GAME_WIDTH);
         */
         // Da Canvas quadratisch, Hoehe = Breite setzen
-        this.gameModel.canvasData.DISPLAY_CANVAS.height = this.gameModel.canvasData.DISPLAY_CANVAS.width;
+        CANVAS_DATA.DISPLAY_CANVAS.height = CANVAS_DATA.DISPLAY_CANVAS.width;
 
         // WRAPPER DIV wird an Canvasgroeße angepasst
         CANVAS_DATA.DIV_WRAPPER.style.width = CANVAS_DATA.DISPLAY_CANVAS.width +"px";
@@ -117,11 +117,11 @@ export default class GameController {
 
         //TODO: wenn doch nicht mehr benötigt, rausnehmen:
 
-        // let rectangle = this.gameModel.canvasData.DISPLAY_CANVAS.getBoundingClientRect();
+        // let rectangle = CANVAS_DATA.DISPLAY_CANVAS.getBoundingClientRect();
         //
-        // this.gameModel.canvasData.P.style.left = rectangle.left + "px";
-        // this.gameModel.canvasData.P.style.top = rectangle.top + "px";
-        // this.gameModel.canvasData.P.style.fontSize = this.gameModel.canvasData.TILE_SIZE * rectangle.height / this.gameModel.canvasData.GAME_HEIGHT + "px";
+        // CANVAS_DATA.P.style.left = rectangle.left + "px";
+        // CANVAS_DATA.P.style.top = rectangle.top + "px";
+        // CANVAS_DATA.P.style.fontSize = CANVAS_DATA.TILE_SIZE * rectangle.height / CANVAS_DATA.GAME_HEIGHT + "px";
 
     }
 
@@ -141,7 +141,7 @@ export default class GameController {
         window.addEventListener("resize", (event) => {
             this.handleResize();
         });
-        this.gameModel.canvasData.DISPLAY_CANVAS.addEventListener('mousemove', (event: any) => {
+        CANVAS_DATA.DISPLAY_CANVAS.addEventListener('mousemove', (event: any) => {
             this.stateController.handleEvent(event);
         })
     }

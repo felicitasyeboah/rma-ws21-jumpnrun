@@ -4,7 +4,8 @@ import {Coin, Enemy, GameObject, MovingPlatform, Water} from "../models/objects/
 import {WorldView} from "../views/WorldView.js";
 import {SpriteGroup} from "../models/objects/SpriteGroup.js";
 import {StateController} from "./StateController.js";
-import {checkHighScore, loadHighscores, saveHighScore} from "../highscore_utils.js";
+import {checkHighScore, saveHighScore} from "../highscore_utils.js";
+import {CANVAS_DATA} from "../game_config.js";
 
 /**
  * Der WoldController verwaltet und updated die Daten der WorldView
@@ -97,7 +98,7 @@ export class WorldController extends StateController {
         if ((event.target.className == "btn btn-quit" && GameModel.KEY.ENTER.includes((event.key))) ||
             (event.type == "click" && event.target.className == "btn btn-quit")) {
             this.view.done = true;
-            this.gameModel.canvasData.DIV_RESTART.style.display = "none";
+            CANVAS_DATA.DIV_RESTART.style.display = "none";
             this.player.reset();
         }
 
@@ -108,7 +109,7 @@ export class WorldController extends StateController {
             this.view.next = 'highscore';
             const username = this.getPlayerNameFromInput();
             saveHighScore(this.player.getCoinCounter(), username);
-            this.gameModel.canvasData.DIV_NEW_HIGHSCORE.style.display = "none";
+            CANVAS_DATA.DIV_NEW_HIGHSCORE.style.display = "none";
             this.player.reset();
         }
         // if (State.KEY.RIGHT.includes(event.key)) {
@@ -153,8 +154,9 @@ export class WorldController extends StateController {
     handleGameOver(userScore: number) {
         if (!checkHighScore(userScore)) {
             console.log("GameOver. kein neuer Highscore");
+            
         } else {
-            this.gameModel.canvasData.DIV_NEW_HIGHSCORE.style.display = "flex";
+            CANVAS_DATA.DIV_NEW_HIGHSCORE.style.display = "flex";
         }
     }
 
@@ -188,29 +190,29 @@ export class WorldController extends StateController {
     // setzt das Spiel fort, nachdem es pausiert wurde
     private resumeState() {
         this.gameModel.keyState.pause = false;
-        this.gameModel.canvasData.DIV_PAUSE.style.display = "none";
+        CANVAS_DATA.DIV_PAUSE.style.display = "none";
         this.view.setLevelTimer();
     }
 
     // Pausiert das Spiel
     private pauseState() {
         this.gameModel.keyState.pause = true;
-        this.gameModel.canvasData.DIV_PAUSE.style.display = "flex";
+        CANVAS_DATA.DIV_PAUSE.style.display = "flex";
         this.view.stopLevelTimer(this.view.levelTimer);
 
     }
 
     // setzt den Spieler wieder am Anfang des Levels beginnen, nachdem er gestorben ist und noch Leben uebrig hat
     private restartLevel() {
-        this.gameModel.canvasData.DIV_RESTART.style.display = "none";
+        CANVAS_DATA.DIV_RESTART.style.display = "none";
         this.player.reborn();
         this.view.setLevelTimer();
     }
 
     // blendet das RestartMenu mit Quit und Restart Game Button ein, wenn der Spieler ein Leben verliert und noch Leben uebrig hat.
     private showRestartBtn() {
-        this.gameModel.canvasData.DIV_RESTART.style.display = "flex";
-        this.gameModel.canvasData.DIV_RESTART.focus();
+        CANVAS_DATA.DIV_RESTART.style.display = "flex";
+        CANVAS_DATA.DIV_RESTART.focus();
         this.view.stopLevelTimer(this.view.levelTimer);
     }
 
@@ -225,17 +227,17 @@ export class WorldController extends StateController {
             object.setLeft(0)
         }
         // rechte Seite des canvas
-        if (object.getRight() > this.canvasData.GAME_WIDTH) {
-            object.setRight(this.canvasData.GAME_WIDTH)
+        if (object.getRight() > CANVAS_DATA.GAME_WIDTH) {
+            object.setRight(CANVAS_DATA.GAME_WIDTH)
         }
         // Obere Seite des canvas
         if (object.getTop() < 0) {
             object.setTop(0)
         }
         // untere Seite des canvas
-        if (object.getBottom() > this.canvasData.GAME_HEIGHT) {
+        if (object.getBottom() > CANVAS_DATA.GAME_HEIGHT) {
             object.setInTheAir(false);
-            object.setBottom(this.canvasData.GAME_HEIGHT);
+            object.setBottom(CANVAS_DATA.GAME_HEIGHT);
         }
 
         // Tilebased-Collision-Detection: Collision-Handling zur Collision mit einem Tile innerhalb der CollisionMap
@@ -272,9 +274,9 @@ export class WorldController extends StateController {
      * @return Wert aus der Collisionmap
      */
     getTopLeftTileValue(object: GameObject) {
-        this.rowTopPosition = Math.floor(object.getTop() / this.canvasData.TILE_SIZE); // berechnet die row der topPosition  des objects in der TileMap
-        this.columnLeftPosition = Math.floor(object.getLeft() / this.canvasData.TILE_SIZE); // berechnet den column der leftPosition des objects in der TileMap
-        return this.collisionMapData["level" + this.gameModel.getCurrentLevel()][this.rowTopPosition * this.canvasData.COLS + this.columnLeftPosition];
+        this.rowTopPosition = Math.floor(object.getTop() / CANVAS_DATA.TILE_SIZE); // berechnet die row der topPosition  des objects in der TileMap
+        this.columnLeftPosition = Math.floor(object.getLeft() / CANVAS_DATA.TILE_SIZE); // berechnet den column der leftPosition des objects in der TileMap
+        return this.collisionMapData["level" + this.gameModel.getCurrentLevel()][this.rowTopPosition * CANVAS_DATA.COLS + this.columnLeftPosition];
     }
 
     /**
@@ -283,9 +285,9 @@ export class WorldController extends StateController {
      * @return Wert aus der Collisionmap
      */
     getTopRightTileValue(object: GameObject) {
-        this.rowTopPosition = Math.floor(object.getTop() / this.canvasData.TILE_SIZE);
-        this.columnRightPosition = Math.floor(object.getRight() / this.canvasData.TILE_SIZE);
-        return this.collisionMapData["level" + this.gameModel.getCurrentLevel()][this.rowTopPosition * this.canvasData.COLS + this.columnRightPosition];
+        this.rowTopPosition = Math.floor(object.getTop() / CANVAS_DATA.TILE_SIZE);
+        this.columnRightPosition = Math.floor(object.getRight() / CANVAS_DATA.TILE_SIZE);
+        return this.collisionMapData["level" + this.gameModel.getCurrentLevel()][this.rowTopPosition * CANVAS_DATA.COLS + this.columnRightPosition];
     }
 
     /**
@@ -294,9 +296,9 @@ export class WorldController extends StateController {
      * @return Wert aus der Collisionmap
      */
     getBottomLeftTileValue(object: GameObject) {
-        this.rowBottomPosition = Math.floor(object.getBottom() / this.canvasData.TILE_SIZE);
-        this.columnLeftPosition = Math.floor(object.getLeft() / this.canvasData.TILE_SIZE);
-        return this.collisionMapData["level" + this.gameModel.getCurrentLevel()][this.rowBottomPosition * this.canvasData.COLS + this.columnLeftPosition];
+        this.rowBottomPosition = Math.floor(object.getBottom() / CANVAS_DATA.TILE_SIZE);
+        this.columnLeftPosition = Math.floor(object.getLeft() / CANVAS_DATA.TILE_SIZE);
+        return this.collisionMapData["level" + this.gameModel.getCurrentLevel()][this.rowBottomPosition * CANVAS_DATA.COLS + this.columnLeftPosition];
     }
 
     /**
@@ -305,9 +307,9 @@ export class WorldController extends StateController {
      * @return Wert aus der Collisionmap
      */
     getBottomRightTileValue(object: GameObject) {
-        this.rowBottomPosition = Math.floor(object.getBottom() / this.canvasData.TILE_SIZE);
-        this.columnRightPosition = Math.floor(object.getRight() / this.canvasData.TILE_SIZE);
-        return this.collisionMapData["level" + this.gameModel.getCurrentLevel()][this.rowBottomPosition * this.canvasData.COLS + this.columnRightPosition];
+        this.rowBottomPosition = Math.floor(object.getBottom() / CANVAS_DATA.TILE_SIZE);
+        this.columnRightPosition = Math.floor(object.getRight() / CANVAS_DATA.TILE_SIZE);
+        return this.collisionMapData["level" + this.gameModel.getCurrentLevel()][this.rowBottomPosition * CANVAS_DATA.COLS + this.columnRightPosition];
     }
 
     // routing function - zuordnen des Collision-Tiles zu der entsprechenden Collision-function
@@ -328,10 +330,10 @@ export class WorldController extends StateController {
         let topTileY: number | undefined, rightTileX: number | undefined, leftTileX: number | undefined,
             bottomTileY: number | undefined;
 
-        leftTileX = column * this.canvasData.TILE_SIZE;
-        topTileY = row * this.canvasData.TILE_SIZE;
-        rightTileX = column * this.canvasData.TILE_SIZE + this.canvasData.TILE_SIZE;
-        bottomTileY = row * this.canvasData.TILE_SIZE + this.canvasData.TILE_SIZE;
+        leftTileX = column * CANVAS_DATA.TILE_SIZE;
+        topTileY = row * CANVAS_DATA.TILE_SIZE;
+        rightTileX = column * CANVAS_DATA.TILE_SIZE + CANVAS_DATA.TILE_SIZE;
+        bottomTileY = row * CANVAS_DATA.TILE_SIZE + CANVAS_DATA.TILE_SIZE;
 
         if (value === undefined) return;
         switch (value) {

@@ -12,7 +12,7 @@ export default class StartMenuView extends State {
     private _btnInstruction!: Button;
 
     constructor(private gameModel: GameModel) {
-        super(gameModel.canvasData);
+        super(CANVAS_DATA);
         this._next = "world";
         this.buttonWidth = 8;
         this.buttonHeight = 1.5;

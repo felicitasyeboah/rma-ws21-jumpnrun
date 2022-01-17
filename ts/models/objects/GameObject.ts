@@ -1,4 +1,5 @@
 import {GameModel} from "../GameModel.js";
+import {CANVAS_DATA} from "../../game_config.js";
 
 export class GameObject {
     protected xOld: number;
@@ -207,7 +208,7 @@ export class Enemy extends MovingItem {
     update() {
         this.x += this.moveDirection;
         this.moveCounter++;
-        if (this.moveCounter > this.gameModel.canvasData.TILE_SIZE) {
+        if (this.moveCounter > CANVAS_DATA.TILE_SIZE) {
             this.moveDirection *= -1;
             this.moveCounter *= -1;
         }
@@ -233,7 +234,7 @@ export class MovingPlatform extends MovingItem {
         this.x += this.moveDirection * this.moveX;
         this.y += this.moveDirection * this.moveY;
         this.moveCounter++;
-        if (this.moveCounter > this.gameModel.canvasData.TILE_SIZE) {
+        if (this.moveCounter > CANVAS_DATA.TILE_SIZE) {
             this.moveDirection *= -1;
             this.moveCounter *= -1;
         }

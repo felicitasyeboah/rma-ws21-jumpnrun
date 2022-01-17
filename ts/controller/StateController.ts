@@ -3,11 +3,9 @@ import {State} from "../views/State.js";
 import {Canvasdata} from "../game_config.js";
 
 export abstract class StateController {
-    readonly canvasData: Canvasdata;
     protected abstract view: State;
     protected constructor(protected gameModel: GameModel) {
         this.gameModel = gameModel;
-        this.canvasData = gameModel.canvasData;
     }
 
     abstract handleEvent(event: any): void;

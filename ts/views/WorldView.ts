@@ -3,6 +3,7 @@ import {GameModel} from "../models/GameModel.js";
 import {Player} from "../models/objects/Player.js";
 import {Coin, Enemy, GameItem, MovingPlatform, Water} from "../models/objects/GameObject.js";
 import {SpriteGroup} from "../models/objects/SpriteGroup.js";
+import {CANVAS_DATA} from "../game_config.js";
 
 /**
  * Erstellt ein WorldView Objekt. Die WorldView stellt die Spielewelt dar.
@@ -27,9 +28,9 @@ export class WorldView extends State {
 
 
     constructor(private gameModel: GameModel) {
-        super(gameModel.canvasData);
+        super(CANVAS_DATA);
         this._next = "startMenu";
-        this.hudCtx = gameModel.canvasData.HUD_CTX;
+        this.hudCtx = CANVAS_DATA.HUD_CTX;
         this.tileMapLevelData = gameModel.tileMapLevelData;
         this._timeToFinishLevel = 100; // in seconds
         this.player = gameModel.getPlayer();
@@ -400,7 +401,7 @@ export class WorldView extends State {
             55);
 
         this.hudCtx.fillText("TIME " + this._timeToFinishLevel.toString(), this.tileSize * 15.5, 55)
-        this.bufferCtx.drawImage(this.gameModel.canvasData.HUD_CANVAS, 0, 0);
+        this.bufferCtx.drawImage(CANVAS_DATA.HUD_CANVAS, 0, 0);
 
     }
 

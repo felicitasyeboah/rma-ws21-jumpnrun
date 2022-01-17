@@ -11,7 +11,7 @@ export default class HighscoreView extends State {
     private _btnBackToMenu!: Button;
 
     constructor(private gameModel: GameModel) {
-        super(gameModel.canvasData);
+        super(CANVAS_DATA);
         this._next = "startMenu";
         this.buttonWidth = 8;
         this.buttonHeight = 1.5;

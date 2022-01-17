@@ -61,7 +61,7 @@ export class HighscoreController extends StateController {
 
     // findet den Button, auf den geklickt wurde, anhand der Mausposition
     handleClickedButton(event: Event) {
-        let mousePos = this.getMousePos(this.canvasData.DISPLAY_CANVAS, event);
+        let mousePos = this.getMousePos(CANVAS_DATA.DISPLAY_CANVAS, event);
         this.view.buttonGroup.forEach((btn: Button) => {
 
             if (this.mouseOverlapsButton(mousePos, btn)) {
@@ -79,7 +79,7 @@ export class HighscoreController extends StateController {
     }
     // prueft die Position der Maus und gibt bei einer Ueberlappung mit einem Button,
     handleMouseMovement(event: MouseEvent) {
-        let mousePos = this.getMousePos(this.canvasData.DISPLAY_CANVAS, event);
+        let mousePos = this.getMousePos(CANVAS_DATA.DISPLAY_CANVAS, event);
         this.view.buttonGroup.forEach((btn: Button) => {
             if (this.mouseOverlapsButton(mousePos, btn)) {
                 this.highlightButton(btn);
