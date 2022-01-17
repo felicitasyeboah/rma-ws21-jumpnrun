@@ -4,7 +4,7 @@ import {Coin, Enemy, GameObject, MovingPlatform, Water} from "../models/objects/
 import {WorldView} from "../views/WorldView.js";
 import {SpriteGroup} from "../models/objects/SpriteGroup.js";
 import {StateController} from "./StateController.js";
-import {gameOver} from "../models/Highscore.js";
+import {checkHighScore, loadHighscores, saveHighScore} from "../highscore_utils.js";
 
 /**
  * Der WoldController verwaltet und updated die Daten der WorldView
@@ -51,15 +51,12 @@ export class WorldController extends StateController {
     handleEvent(event: any): void {
         if (event.type === "keydown") {
             if (GameModel.KEY.LEFT.includes(event.key) && !this.gameModel.keyState.left) {
-                event.preventDefault();
                 this.gameModel.keyState.left = true;
             }
             if (GameModel.KEY.RIGHT.includes(event.key) && !this.gameModel.keyState.right) {
-                event.preventDefault();
                 this.gameModel.keyState.right = true;
             }
             if (GameModel.KEY.JUMP.includes(event.key)) {
-                event.preventDefault();
                 if (!this.player.getInTheAir() && !this.gameModel.keyState.jump) {
                     this.gameModel.keyState.jump = true;
                     this.player.setYVelocity(this.player.getJumpHeight());
@@ -87,24 +84,33 @@ export class WorldController extends StateController {
                 this.resumeState();
             }
         }
-        // Pause-Fenster: wenn auf den Reume Button geclickt wird -> resume Game
+        // Pause-Fenster: wenn auf den Resume Button geclickt wird -> resume Game
         if (event.type == "click" && event.target.className == "btn btn-resume" && this.gameModel.keyState.pause) {
             this.resumeState();
         }
         // Restart-Fenster: wenn auf den Restart-Button geclickt wird -> restart Level
-        if((event.target.className == "btn btn-restart" && GameModel.KEY.ENTER.includes((event.key))) ||
+        if ((event.target.className == "btn btn-restart" && GameModel.KEY.ENTER.includes((event.key))) ||
             (event.type == "click" && event.target.className == "btn btn-restart")) {
             this.restartLevel();
         }
         // Restart-Fenster: wenn auf den Quit-Button geclickt wird -> Quit Game (zurueck zum Hauptmenue)
-        if((event.target.className == "btn btn-quit" && GameModel.KEY.ENTER.includes((event.key))) ||
+        if ((event.target.className == "btn btn-quit" && GameModel.KEY.ENTER.includes((event.key))) ||
             (event.type == "click" && event.target.className == "btn btn-quit")) {
             this.view.done = true;
             this.gameModel.canvasData.DIV_RESTART.style.display = "none";
             this.player.reset();
-
         }
 
+        // New Highscore-Fenster: wenn auf den Save-Button geclickt wird -> Save username (weiter zum Highscorescreen)
+        if ((event.target.className == "btn btn-new_highscore" && GameModel.KEY.ENTER.includes((event.key))) ||
+            (event.type == "click" && event.target.className == "btn btn-new_highscore")) {
+            this.view.done = true;
+            this.view.next = 'highscore';
+            const username = this.getPlayerNameFromInput();
+            saveHighScore(this.player.getCoinCounter(), username);
+            this.gameModel.canvasData.DIV_NEW_HIGHSCORE.style.display = "none";
+            this.player.reset();
+        }
         // if (State.KEY.RIGHT.includes(event.key)) {
         //     this.player.move("right");
         // } else if (State.KEY.LEFT.includes(event.key)) {
@@ -131,18 +137,30 @@ export class WorldController extends StateController {
 
             // wenn Spieler keine Leben mehr hat
             if (this.player.getLifeCounter() == 0) {
-                console.log("GameOver");
-                //TODO: highscore, wenn player keien leben mehr hat
-                gameOver(this.player.getCoinCounter());
+                // pruefen, ob ein neuer Highscore erreicht wurde
+                this.handleGameOver(this.player.getCoinCounter());
+
             } else {
                 // wenn Spieler noch leben uebrig hat
                 this.showRestartBtn();
             }
 
-
             //TODO: player image gegen ghost austauschen
 
         }
+    }
+
+    handleGameOver(userScore: number) {
+        if (!checkHighScore(userScore)) {
+            console.log("GameOver. kein neuer Highscore");
+        } else {
+            this.gameModel.canvasData.DIV_NEW_HIGHSCORE.style.display = "flex";
+        }
+    }
+
+    getPlayerNameFromInput() {
+        const input = document.getElementById('player_name')! as HTMLInputElement;
+        return input.value;
     }
 
     /**
@@ -173,6 +191,7 @@ export class WorldController extends StateController {
         this.gameModel.canvasData.DIV_PAUSE.style.display = "none";
         this.view.setLevelTimer();
     }
+
     // Pausiert das Spiel
     private pauseState() {
         this.gameModel.keyState.pause = true;
@@ -180,12 +199,14 @@ export class WorldController extends StateController {
         this.view.stopLevelTimer(this.view.levelTimer);
 
     }
+
     // setzt den Spieler wieder am Anfang des Levels beginnen, nachdem er gestorben ist und noch Leben uebrig hat
     private restartLevel() {
         this.gameModel.canvasData.DIV_RESTART.style.display = "none";
         this.player.reborn();
         this.view.setLevelTimer();
     }
+
     // blendet das RestartMenu mit Quit und Restart Game Button ein, wenn der Spieler ein Leben verliert und noch Leben uebrig hat.
     private showRestartBtn() {
         this.gameModel.canvasData.DIV_RESTART.style.display = "flex";
@@ -478,7 +499,7 @@ export class WorldController extends StateController {
             this.coinGroup.getSprites().forEach((coin: Coin) => {
                 if (this.collideCoin(this.player, coin)) {
                     this.coinGroup.delete(coin);
-                    this.player.setCoinCounter(this.player.getCoinCounter()+1)
+                    this.player.setCoinCounter(this.player.getCoinCounter() + 1)
                 }
             });
             this.waterGroup.getSprites().forEach((water: Water) => {

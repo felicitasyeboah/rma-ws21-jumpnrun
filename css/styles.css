@@ -29,6 +29,7 @@ button {
     border: 3px solid green;
     display: flex;
     justify-content: center;
+    flex-direction: column;
 }
 #pause, #restart {
     display: none;
@@ -45,7 +46,32 @@ button {
     border: 7px solid white;
 }
 
-.font-pause, .font-restart {
+#new_highscore {
+    display: none;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    align-self: center;
+    position:absolute;
+    background-color: white;
+    opacity: 0.99;
+    color: blue; /*3cbfee #FEA443;*/
+    padding: 2% 2%;
+    width: 40%;
+    border: 7px solid white;
+}
+#new_highscore > h2 {
+    font-size: 2.7vmin;
+}
+
+#new_highscore > input {
+    margin: 10% 20%;
+    padding: 0 2%;
+    height:5vmin;
+    width:90%;
+
+}
+.font-pause, .font-restart, .font-new_highscore {
     display:inline-block;
     padding: 0% 0% 20% 0%;
     font-size:2.2vmin;
@@ -62,12 +88,13 @@ button {
     transition-duration: 0.4s;
     cursor: pointer;
 }
-.btn-resume, .btn-restart, .btn-quit {
+.btn-resume, .btn-restart, .btn-quit, .btn-new_highscore {
     border: 7px solid white; /*#14b1da;*/
     font-size:1.9vmin;
 }
 
-.btn-resume:hover, .btn-restart:hover, .btn-quit:hover, .btn-resume:focus, .btn-restart:focus, .btn-quit:focus {
+.btn-resume:hover, .btn-restart:hover, .btn-quit:hover, .btn-new_highscore:hover, .btn-resume:focus, .btn-restart:focus,
+.btn-quit:focus, .btn-new_highscore:focus {
     background-color: white;
     color: blue;
     border-color: #FEA443;
