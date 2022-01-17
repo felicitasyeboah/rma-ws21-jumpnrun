@@ -47,6 +47,6 @@ export function showHighScores() {
     const highScoreList = document.getElementById(HIGH_SCORES)!;
     CANVAS_DATA.DIV_HIGHSCORE.style.display = 'flex';
     highScoreList.innerHTML = highScores
-        .map((score: any) => `<li>${score.score} - ${score.name}`)
+        .map((score: any) => `<li>${score.score} pts - ${score.name}`)
         .join('');
 }
