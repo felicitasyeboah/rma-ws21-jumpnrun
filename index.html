@@ -21,13 +21,18 @@
 </div>
 <div id="restart">
     <div class="font-restart">You died!</div>
-    <button class="btn btn-restart">RESTART LEVEL</button>
+    <button class="btn btn-restart-level">RESTART LEVEL</button>
     <button class="btn btn-quit">QUIT GAME</button>
 </div>
-<div id="new_highscore" class="font-new_highscore">
-   <h2> New highscore!</h2>
+    <div id="gameover">
+        <div class="font-gameover"></div>
+        <button class="btn btn-restart-game">RESTART GAME</button>
+        <button class="btn btn-quit">QUIT GAME</button>
+    </div>
+<div id="new_highscore">
+   <div class="font-new_highscore"></div>
 
-    <label for="player_name"></label><input type="text" id="player_name" value="enter name">
+    <label for="player_name"></label><input type="text" id="player_name" value="" placeholder="enter name">
 
     <button class="btn btn-new_highscore">Save</button>
 </div>

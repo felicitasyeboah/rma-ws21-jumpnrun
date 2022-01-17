@@ -90,28 +90,31 @@ export class WorldController extends StateController {
             this.resumeState();
         }
         // Restart-Fenster: wenn auf den Restart-Button geclickt wird -> restart Level
-        if ((event.target.className == "btn btn-restart" && GameModel.KEY.ENTER.includes((event.key))) ||
-            (event.type == "click" && event.target.className == "btn btn-restart")) {
+        if ((event.target.className == "btn btn-restart-level" && GameModel.KEY.ENTER.includes((event.key))) ||
+            (event.type == "click" && event.target.className == "btn btn-restart-level")) {
             this.restartLevel();
         }
-        // Restart-Fenster: wenn auf den Quit-Button geclickt wird -> Quit Game (zurueck zum Hauptmenue)
+        // Game Over-Fenster: wenn auf den Quit-Button geclickt wird -> Quit Game (zurueck zum Hauptmenue)
         if ((event.target.className == "btn btn-quit" && GameModel.KEY.ENTER.includes((event.key))) ||
             (event.type == "click" && event.target.className == "btn btn-quit")) {
-            this.view.done = true;
-            CANVAS_DATA.DIV_RESTART.style.display = "none";
-            this.player.reset();
+            this.quitGame();
+        }
+        // Restart-Fenster: wenn auf den Restart-Button geclickt wird -> restart Level
+        if ((event.target.className == "btn btn-restart-game" && GameModel.KEY.ENTER.includes((event.key))) ||
+            (event.type == "click" && event.target.className == "btn btn-restart-game")) {
+            this.restartGame();
         }
 
         // New Highscore-Fenster: wenn auf den Save-Button geclickt wird -> Save username (weiter zum Highscorescreen)
         if ((event.target.className == "btn btn-new_highscore" && GameModel.KEY.ENTER.includes((event.key))) ||
             (event.type == "click" && event.target.className == "btn btn-new_highscore")) {
-            this.view.done = true;
-            this.view.next = 'highscore';
             const username = this.getPlayerNameFromInput();
             saveHighScore(this.player.getCoinCounter(), username);
-            CANVAS_DATA.DIV_NEW_HIGHSCORE.style.display = "none";
-            this.player.reset();
+            this.view.next = 'highscore';
+            this.quitGame();
         }
+
+
         // if (State.KEY.RIGHT.includes(event.key)) {
         //     this.player.move("right");
         // } else if (State.KEY.LEFT.includes(event.key)) {
@@ -138,6 +141,7 @@ export class WorldController extends StateController {
 
             // wenn Spieler keine Leben mehr hat
             if (this.player.getLifeCounter() == 0) {
+
                 // pruefen, ob ein neuer Highscore erreicht wurde
                 this.handleGameOver(this.player.getCoinCounter());
 
@@ -151,12 +155,27 @@ export class WorldController extends StateController {
         }
     }
 
+    // wertet GameOver aus -> wurde ein neuer Highscore erreicht?
     handleGameOver(userScore: number) {
+        // wenn kein neuer Highscore erreich wurde
         if (!checkHighScore(userScore)) {
             console.log("GameOver. kein neuer Highscore");
-            
-        } else {
+            CANVAS_DATA.DIV_GAME_OVER.style.display = "flex";
+
+            if(this.gameModel.getCurrentLevel() < this.gameModel.getMaxLevel()) {
+                CANVAS_DATA.DIV_GAME_OVER.querySelector('div')!.innerText = "Game over! <br/><br/><br/>Your score:<br/><br/>" + this.player.getCoinCounter();
+            } else if (this.gameModel.getCurrentLevel() == this.gameModel.getMaxLevel()) {
+                CANVAS_DATA.DIV_GAME_OVER.querySelector('div')!.innerText = "You finished game! <br/><br/><br/> Your score:<br/><br/>" + this.player.getCoinCounter();
+            }
+        }
+        // wenn ein neuer Highscore erreich wurde
+        else {
             CANVAS_DATA.DIV_NEW_HIGHSCORE.style.display = "flex";
+            if(this.gameModel.getCurrentLevel() < this.gameModel.getMaxLevel()) {
+                CANVAS_DATA.DIV_NEW_HIGHSCORE.querySelector('div')!.innerText = "Game over<br /><br /><br /> New highscore:<br /><br />" + this.player.getCoinCounter();
+            } else if (this.gameModel.getCurrentLevel() == this.gameModel.getMaxLevel()) {
+               CANVAS_DATA.DIV_NEW_HIGHSCORE.querySelector('div')!.innerText = "You finished game! <br /><br /><br /> New highscore:<br /><br />" + this.player.getCoinCounter();
+            }
         }
     }
 
@@ -178,6 +197,7 @@ export class WorldController extends StateController {
         } else {
             //TODO: Ende des Spiels, Highscore/Score anzeigen
             console.log("maximales level erreicht");
+            this.handleGameOver(this.player.getCoinCounter());
         }
     }
 
@@ -199,7 +219,11 @@ export class WorldController extends StateController {
         this.gameModel.keyState.pause = true;
         CANVAS_DATA.DIV_PAUSE.style.display = "flex";
         this.view.stopLevelTimer(this.view.levelTimer);
+    }
 
+    private restartGame() {
+        this.view.next = 'world';
+        this.view.done = true;
     }
 
     // setzt den Spieler wieder am Anfang des Levels beginnen, nachdem er gestorben ist und noch Leben uebrig hat
@@ -207,6 +231,15 @@ export class WorldController extends StateController {
         CANVAS_DATA.DIV_RESTART.style.display = "none";
         this.player.reborn();
         this.view.setLevelTimer();
+    }
+
+    // zurueck zum StartMenu -> setzt alle Daten zurueck
+    private quitGame() {
+        this.view.done = true;
+        CANVAS_DATA.DIV_RESTART.style.display = "none";
+        CANVAS_DATA.DIV_GAME_OVER.style.display = "none";
+        CANVAS_DATA.DIV_NEW_HIGHSCORE.style.display = "none";
+        this.player.reset();
     }
 
     // blendet das RestartMenu mit Quit und Restart Game Button ein, wenn der Spieler ein Leben verliert und noch Leben uebrig hat.
@@ -312,7 +345,6 @@ export class WorldController extends StateController {
         return this.collisionMapData["level" + this.gameModel.getCurrentLevel()][this.rowBottomPosition * CANVAS_DATA.COLS + this.columnRightPosition];
     }
 
-    // routing function - zuordnen des Collision-Tiles zu der entsprechenden Collision-function
     /**
      *  routing function - Ordnet den Wert des collision-tiles der entsprechenden collision-function zu
      * @param value Wert des collision-tiles

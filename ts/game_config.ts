@@ -16,6 +16,7 @@ const DIV_PAUSE = document.getElementById("pause")!;
 const DIV_RESTART = document.getElementById('restart')!;
 const DIV_HIGHSCORE = document.getElementById('highscore')!;
 const DIV_NEW_HIGHSCORE = document.getElementById('new_highscore')!;
+const DIV_GAME_OVER = document.getElementById('gameover')!;
 
 // Buffer canvas: die nativen tilemapdaten werden hier rein gezeichnet
 const BUFFER_CANVAS = document.createElement('canvas') as HTMLCanvasElement;
@@ -41,6 +42,7 @@ DISPLAY_CANVAS.innerText = "Ihr Browser unterstuetzt kein Canvas Element.";
 
 export type Canvasdata = {
     DIV_WRAPPER: HTMLElement,
+    DIV_GAME_OVER: HTMLElement,
     DIV_NEW_HIGHSCORE: HTMLElement,
     DIV_HIGHSCORE: HTMLElement,
     DIV_RESTART: HTMLElement,
@@ -60,6 +62,7 @@ export type Canvasdata = {
 }
 export const CANVAS_DATA: Canvasdata = {
     DIV_WRAPPER: DIV_WRAPPER,
+    DIV_GAME_OVER: DIV_GAME_OVER,
     DIV_NEW_HIGHSCORE: DIV_NEW_HIGHSCORE,
     DIV_HIGHSCORE: DIV_HIGHSCORE,
     DIV_RESTART: DIV_RESTART,

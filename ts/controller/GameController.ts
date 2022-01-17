@@ -141,7 +141,7 @@ export default class GameController {
         window.addEventListener("resize", (event) => {
             this.handleResize();
         });
-        CANVAS_DATA.DISPLAY_CANVAS.addEventListener('mousemove', (event: any) => {
+        CANVAS_DATA.DIV_WRAPPER.addEventListener('mousemove', (event: any) => {
             this.stateController.handleEvent(event);
         })
     }

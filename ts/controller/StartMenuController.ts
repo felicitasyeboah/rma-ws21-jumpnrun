@@ -19,10 +19,12 @@ export class StartMenuController extends StateController {
             if (GameModel.KEY.UP.includes(event.key)) {
                 this.gameModel.keyState.up = true;
                 this.switchButtonUpwards();
+                event.preventDefault();
             }
             if (GameModel.KEY.DOWN.includes(event.key)) {
                 this.gameModel.keyState.down = true;
                 this.switchButtonDownwards();
+                event.preventDefault();
             }
             if (GameModel.KEY.ENTER.includes(event.key)) {
                 this.gameModel.keyState.enter = true;
