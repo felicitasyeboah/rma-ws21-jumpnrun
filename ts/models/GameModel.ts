@@ -1,5 +1,5 @@
 import {Player} from "./objects/Player.js"
-import {Canvasdata, keyState} from "../main.js";
+import {Canvasdata, keyState} from "../game_config.js";
 import {SpriteGroup} from "./objects/SpriteGroup.js";
 
 /**

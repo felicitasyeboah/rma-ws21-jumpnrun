@@ -2,7 +2,7 @@ import {StateController} from "./StateController.js";
 import {GameModel} from "../models/GameModel.js";
 import StartMenuView from "../views/StartMenuView.js";
 import Button from "../models/Button.js";
-import {CANVAS_DATA} from "../main.js";
+import {CANVAS_DATA} from "../game_config.js";
 //TODO: eintragen, was das bei highscore die highscoreview und bei instruction die instructionview geladen wird
 /*
     Verarbeitet Benutzereingaben per Maus oder Tastatur,

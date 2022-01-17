@@ -1,5 +1,5 @@
 //AbstrakteKlasse
-import {Canvasdata} from "../main.js";
+import {Canvasdata} from "../game_config.js";
 import Button from "../models/Button.js";
 
 /**

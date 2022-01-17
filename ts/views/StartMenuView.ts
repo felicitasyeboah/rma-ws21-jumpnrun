@@ -1,7 +1,7 @@
 import {GameModel} from "../models/GameModel.js";
 import {State} from "./State.js";
 import Button from "../models/Button.js";
-import {CANVAS_DATA} from "../main.js";
+import {CANVAS_DATA} from "../game_config.js";
 
 export default class StartMenuView extends State {
     protected _next: string;

@@ -1,5 +1,5 @@
 import {GameModel} from "../GameModel.js";
-import {keyState} from "../../main.js";
+import {keyState} from "../../game_config.js";
 import {GameObject} from "./GameObject.js";
 
 /**
