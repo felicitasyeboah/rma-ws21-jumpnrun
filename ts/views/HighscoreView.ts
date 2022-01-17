@@ -4,6 +4,9 @@ import {CANVAS_DATA} from "../game_config.js";
 import Button from "../models/Button.js";
 import {showHighScores} from "../highscore_utils.js";
 
+/**
+ * Stellt die Highscoretabelle dar
+ */
 export default class HighscoreView extends State {
     protected _next: string;
     private buttonWidth: number;
@@ -26,6 +29,7 @@ export default class HighscoreView extends State {
         HighscoreView._displayHighScores();
     }
 
+    // erstellt  den "Back to Menu" button
     private _initButton() {
         this._btnBackToMenu = new Button(
             'startMenu',
@@ -34,17 +38,16 @@ export default class HighscoreView extends State {
             6,
             17,
             '#FEA443', 0.9,
-            'white', 7,
+            'blue', 7,
             this.font,
             "BACK TO MENU",
-            "white");
+            "blue");
         this._buttonGroup.set(this._btnBackToMenu.name, this._btnBackToMenu);
+        this._activeButton = this._btnBackToMenu;
     }
 
+    // zeichnet den Button
     private _drawButton() {
-        let x = 6 * CANVAS_DATA.TILE_SIZE;
-        let yStart = 7.5 * CANVAS_DATA.TILE_SIZE;
-        let spacer = 2;
         this.buttonGroup.forEach((button) => {
             if (button.bodyColor) {
                 this.bufferCtx.fillStyle = button.bodyColor;
@@ -80,6 +83,7 @@ export default class HighscoreView extends State {
         })
     }
 
+    // zeichnet den Hintergrund
     private _drawBackground() {
         this.bufferCtx.drawImage(
             this.gameModel.backgroundImage,
@@ -90,14 +94,18 @@ export default class HighscoreView extends State {
         );
     }
 
+    // Stellt die Highscoretabelle dar; uebergeben aus dem LocalStorage
     private static _displayHighScores() {
         showHighScores();
     }
+
+    // leert die view
     cleanup(): void {
         this.CANVAS_DATA.BUFFER_CTX.clearRect(0,0, CANVAS_DATA.BUFFER_CANVAS.width, CANVAS_DATA.BUFFER_CANVAS.height);
         this._buttonGroup.clear();
     }
 
+    // updated den das Zeichnen auf dem Canvas
     update(): void {
         this.CANVAS_DATA.BUFFER_CTX.clearRect(0,0, CANVAS_DATA.BUFFER_CANVAS.width, CANVAS_DATA.BUFFER_CANVAS.height);
         this._drawBackground();

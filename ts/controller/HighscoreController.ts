@@ -23,7 +23,6 @@ export class HighscoreController extends StateController {
             }
         }
         if (event.type === "click") {
-            console.log("click");
             this.handleClickedButton(event);
         }
 
@@ -66,7 +65,6 @@ export class HighscoreController extends StateController {
 
             if (this.mouseOverlapsButton(mousePos, btn)) {
                 this.handleSelectedButton(btn);
-                console.log("button clicked", btn.name);
             }
         });
     }
@@ -83,23 +81,29 @@ export class HighscoreController extends StateController {
         this.view.buttonGroup.forEach((btn: Button) => {
             if (this.mouseOverlapsButton(mousePos, btn)) {
                 this.highlightButton(btn);
+            } else if(!this.mouseOverlapsButton(mousePos, btn)) {
+                this.view.buttonGroup.forEach((btn: Button) => {
+                    // btn.bodyColor = undefined;
+                    // btn.alpha = 1;
+                    btn.fontColor = 'blue';
+                    // btn.borderColor = 'white';
+                });
             }
         });
     }
     // highlightet den ausgewählten button
     highlightButton(btn: Button) {
-        this.view.buttonGroup.forEach((btn: Button) => {
-            btn.bodyColor = undefined;
-            btn.alpha = 1;
-            btn.fontColor = 'white';
-            btn.borderColor = 'white';
-        });
+        // this.view.buttonGroup.forEach((btn: Button) => {
+        //     btn.bodyColor = undefined;
+        //     btn.alpha = 1;
+        //     btn.fontColor = 'white';
+        //     btn.borderColor = 'white';
+        // });
         btn.alpha = 0.9;
         btn.bodyColor = '#FEA443';
-        btn.fontColor = 'blue';
+        btn.fontColor = 'white';
         btn.borderColor = 'blue';
         this.view.activeButton = btn;
-        console.log("overlaps", btn.name);
     }
     update(): void {
         this.handleButtonBoundings();
