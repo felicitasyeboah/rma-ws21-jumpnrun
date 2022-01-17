@@ -7,6 +7,7 @@ import {GameModel} from './models/GameModel.js';
 import {Event} from "createjs-module";
 import {WorldController} from "./controller/WorldController.js";
 import {StartMenuController} from "./controller/StartMenuController.js";
+import {HighscoreController} from "./controller/HighscoreController.js";
 
 const TILE_SIZE = 32;
 const ROWS = 20; // nach unten
@@ -20,9 +21,11 @@ const GAME_HEIGHT = ROWS * TILE_SIZE;
 // const P = document.createElement("p");
 // P.setAttribute("style", "color:#ffffff; font-size:2.0em; position:fixed;");
 // document.body.appendChild(P);
+const DIV_WRAPPER = document.getElementById('wrapper')!;
 
 const DIV_PAUSE = document.getElementById("pause")!;
 const DIV_RESTART = document.getElementById('restart')!;
+const DIV_HIGHSCORE = document.getElementById('highscore')!;
 
 // Buffer canvas: die nativen tilemapdaten werden hier rein gezeichnet
 const BUFFER_CANVAS = document.createElement('canvas') as HTMLCanvasElement;
@@ -47,6 +50,8 @@ DISPLAY_CTX.imageSmoothingEnabled = false; // disable ImageSmoothing damit die S
 DISPLAY_CANVAS.innerText = "Ihr Browser unterstuetzt kein Canvas Element.";
 
 export type Canvasdata = {
+    DIV_WRAPPER: HTMLElement,
+    DIV_HIGHSCORE: HTMLElement,
     DIV_RESTART: HTMLElement,
     DIV_PAUSE: HTMLElement,
     BUFFER_CANVAS: HTMLCanvasElement,
@@ -63,6 +68,8 @@ export type Canvasdata = {
     FONT: string
 }
 export const CANVAS_DATA: Canvasdata = {
+    DIV_WRAPPER: DIV_WRAPPER,
+    DIV_HIGHSCORE: DIV_HIGHSCORE,
     DIV_RESTART: DIV_RESTART,
     DIV_PAUSE: DIV_PAUSE,
     BUFFER_CANVAS: BUFFER_CANVAS,
@@ -179,12 +186,12 @@ function startGame() {
     const CONTROLLER_DATA = {
         'world': new WorldController(gameModel, STATE_DATA.world),
         'startMenu': new StartMenuController(gameModel, STATE_DATA.startMenu),
-        'highscore': new WorldController(gameModel, STATE_DATA.world),
+        'highscore': new HighscoreController(gameModel, STATE_DATA.highscore),
         'instruction': new WorldController(gameModel, STATE_DATA.world)
     }
 
     /* View wird anhand des aktuellen States initialisiert in der GameController Klasse */
-    const gameController = new GameController(gameModel, STATE_DATA, 'startMenu', CONTROLLER_DATA);
+    const gameController = new GameController(gameModel, STATE_DATA, 'highscore', CONTROLLER_DATA);
 
     // GameController startet die Hauptspielschleife
     gameController.mainGameLoop(0);

@@ -1,4 +1,5 @@
 import {GameModel} from "../models/GameModel.js";
+import {CANVAS_DATA} from "../main.js";
 
 /**
  * Der Gamecontroller startet den Gameloop. Er registriert Eventlistener und wechselt zwischen den einzelnen
@@ -109,6 +110,10 @@ export default class GameController {
         */
         // Da Canvas quadratisch, Hoehe = Breite setzen
         this.gameModel.canvasData.DISPLAY_CANVAS.height = this.gameModel.canvasData.DISPLAY_CANVAS.width;
+
+        // WRAPPER DIV wird an Canvasgroeße angepasst
+        CANVAS_DATA.DIV_WRAPPER.style.width = CANVAS_DATA.DISPLAY_CANVAS.width +"px";
+        CANVAS_DATA.DIV_WRAPPER.style.height = CANVAS_DATA.DISPLAY_CANVAS.height +"px";
 
         //TODO: wenn doch nicht mehr benötigt, rausnehmen:
 

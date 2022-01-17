@@ -4,6 +4,7 @@ import {Coin, Enemy, GameObject, MovingPlatform, Water} from "../models/objects/
 import {WorldView} from "../views/WorldView.js";
 import {SpriteGroup} from "../models/objects/SpriteGroup.js";
 import {StateController} from "./StateController.js";
+import {gameOver} from "../models/Highscore.js";
 
 /**
  * Der WoldController verwaltet und updated die Daten der WorldView
@@ -24,10 +25,9 @@ export class WorldController extends StateController {
     private coinGroup: SpriteGroup;
     private waterGroup: SpriteGroup;
     private heartGroup: SpriteGroup;
-   // private coinCounter: number;
 
-    constructor(gameModel: GameModel, private worldView: WorldView) {
-        super(gameModel, worldView);
+    constructor(gameModel: GameModel, protected view: WorldView) {
+        super(gameModel);
         this.gameModel = gameModel;
         this.player = gameModel.getPlayer();
         this.collisionMapData = gameModel.collisionMapData;
@@ -99,7 +99,7 @@ export class WorldController extends StateController {
         // Restart-Fenster: wenn auf den Quit-Button geclickt wird -> Quit Game (zurueck zum Hauptmenue)
         if((event.target.className == "btn btn-quit" && GameModel.KEY.ENTER.includes((event.key))) ||
             (event.type == "click" && event.target.className == "btn btn-quit")) {
-            this.worldView.done = true;
+            this.view.done = true;
             this.gameModel.canvasData.DIV_RESTART.style.display = "none";
             this.player.reset();
 
@@ -132,12 +132,14 @@ export class WorldController extends StateController {
             // wenn Spieler keine Leben mehr hat
             if (this.player.getLifeCounter() == 0) {
                 console.log("GameOver");
+                //TODO: highscore, wenn player keien leben mehr hat
+                gameOver(this.player.getCoinCounter());
             } else {
                 // wenn Spieler noch leben uebrig hat
                 this.showRestartBtn();
             }
 
-            //TODO: highscore, wenn player keien leben mehr hat
+
             //TODO: player image gegen ghost austauschen
 
         }
@@ -152,7 +154,7 @@ export class WorldController extends StateController {
         if (nextLevel <= this.gameModel.getMaxLevel()) {
             this.gameModel.setCurrentLevel(nextLevel);
             this.resetLevelData();
-            this.worldView.initLevel();
+            this.view.initLevel();
         } else {
             //TODO: Ende des Spiels, Highscore/Score anzeigen
             console.log("maximales level erreicht");
@@ -162,33 +164,33 @@ export class WorldController extends StateController {
     // Setzt die Leveldaten zurueck vor Eintritt ins das naechste Level
     resetLevelData() {
         this.player.resetPlayerPos();
-        this.worldView.cleanup();
+        this.view.cleanup();
     }
 
     // setzt das Spiel fort, nachdem es pausiert wurde
     private resumeState() {
         this.gameModel.keyState.pause = false;
         this.gameModel.canvasData.DIV_PAUSE.style.display = "none";
-        this.worldView.setLevelTimer();
+        this.view.setLevelTimer();
     }
     // Pausiert das Spiel
     private pauseState() {
         this.gameModel.keyState.pause = true;
         this.gameModel.canvasData.DIV_PAUSE.style.display = "flex";
-        this.worldView.stopLevelTimer(this.worldView.levelTimer);
+        this.view.stopLevelTimer(this.view.levelTimer);
 
     }
     // setzt den Spieler wieder am Anfang des Levels beginnen, nachdem er gestorben ist und noch Leben uebrig hat
     private restartLevel() {
         this.gameModel.canvasData.DIV_RESTART.style.display = "none";
         this.player.reborn();
-        this.worldView.setLevelTimer();
+        this.view.setLevelTimer();
     }
     // blendet das RestartMenu mit Quit und Restart Game Button ein, wenn der Spieler ein Leben verliert und noch Leben uebrig hat.
     private showRestartBtn() {
         this.gameModel.canvasData.DIV_RESTART.style.display = "flex";
         this.gameModel.canvasData.DIV_RESTART.focus();
-        this.worldView.stopLevelTimer(this.worldView.levelTimer);
+        this.view.stopLevelTimer(this.view.levelTimer);
     }
 
     /**

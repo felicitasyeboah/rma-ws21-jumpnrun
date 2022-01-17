@@ -24,6 +24,12 @@ button {
     height:25%;
     font-family: 'Press Start 2P', cursive;
 }
+#wrapper {
+    position: absolute;
+    border: 3px solid green;
+    display: flex;
+    justify-content: center;
+}
 #pause, #restart {
     display: none;
     flex-direction: column;
@@ -36,7 +42,6 @@ button {
     padding: 9% 2%;
     width: 40%;
     border: 7px solid white;
-
 }
 
 .font-pause, .font-restart {
@@ -66,4 +71,32 @@ button {
     color: blue;
     border-color: #FEA443;
     outline: none;
+}
+
+#highscore {
+    display: none;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    position: absolute;
+    color: blue; /*3cbfee #FEA443;*/
+    padding: 5% 2%;
+    min-width: 80%;
+    max-width: 90%;
+    min-height: 80%;
+    max-height:80%;
+}
+#highscore > h2 {
+    font-size: 2.2vw;
+    padding:5% 0 5% 0;
+    height:fit-content;
+}
+#highscore > ol {
+    border: 1px dashed white;
+    padding: 5% 5% 3% 20%;
+    font-size: 1.8vw;
+    height:fit-content;
+}
+#highscore > ol > li {
+    margin-bottom: 2%;
 }
