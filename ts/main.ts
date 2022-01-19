@@ -13,6 +13,7 @@ import {CANVAS_DATA} from "./game_config.js";
 
 let collisionMapData = {};
 let spriteData = {};
+let playerData: any;
 let tileMapLevelData: { [key: string]: number[][] } = {};
 let worldImages: { [key: string]: string } = {};
 
@@ -37,10 +38,11 @@ function loadEntities() {
 
         // Enthält Daten für die Spritesheets
         {id: "spriteData", src: "map_data/sprite_data.json", group: "tileMapLevelData"},
+        {id: "playerData", src: "map_data/player_data.json", group: "tileMapLevelData"},
 
         // Bilder Laden:
         // Player Spritesheet
-        {id: "tilesetPlayer", src: "img/player_sprite.png"},
+        {id: "tilesetPlayer", src: "img/player_spritesheet.png"},
 
         // Tilemap Spritesheet
         {id: "tilesetMap", src: "img/tileset_64x512.png"},
@@ -80,7 +82,12 @@ function handleFileload(event: Event) {
         if (event.item.id == "spriteData") {
             spriteData = event.result;
         }
+        if (event.item.id == "playerData") {
+            playerData = event.result;
+            console.log("playerdata", playerData);
+        }
     }
+
 }
 
 /**
@@ -89,7 +96,7 @@ function handleFileload(event: Event) {
 function startGame() {
 
     /* Model */
-    const gameModel = new GameModel(tileMapLevelData, worldImages, collisionMapData, spriteData);
+    const gameModel = new GameModel(tileMapLevelData, worldImages, collisionMapData, spriteData, playerData);
 
     /* Views */
     const STATE_DATA = {
@@ -108,7 +115,7 @@ function startGame() {
     }
 
     /* View wird anhand des aktuellen States initialisiert in der GameController Klasse */
-    const gameController = new GameController(gameModel, STATE_DATA, 'highscore', CONTROLLER_DATA);
+    const gameController = new GameController(gameModel, STATE_DATA, 'world', CONTROLLER_DATA);
 
     // GameController startet die Hauptspielschleife
     gameController.mainGameLoop(0);

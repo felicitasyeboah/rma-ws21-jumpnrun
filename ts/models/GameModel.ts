@@ -32,15 +32,17 @@ export class GameModel {
     private heartGroup: SpriteGroup;
 
     spriteData: {};
+    playerData: {};
     private _backgroundImage: ImageBitmap;
 
-    constructor(public tileMapLevelData: {}, public worldImages: { [key: string]: string }, public collisionMapData: { [key: string]: number[] }, spriteData: {}) {
+    constructor(public tileMapLevelData: {}, public worldImages: { [key: string]: string },
+                public collisionMapData: { [key: string]: number[] }, spriteData: {}, playerData: any) {
         this.deltatime = 0;
         this.currentLevel = 1;
         this.maxLevel = 3;
         this.levelMap = [];
-        this.gravity = 2.5;
-        this.friction = 0.6; // oder 0.4 / 0.55 mit
+        this.gravity = 2;
+        this.friction = 0.4; // oder 0.4 / 0.55 mit
         this.keyState = {
             right: false,
             left: false,
@@ -50,6 +52,7 @@ export class GameModel {
             pause: false,
             enter: false
         };
+        this.playerData = playerData;
         this.player = new Player(this, 0, 0, 0, 0);
         this.enemyGroup = new SpriteGroup();
         this.platformGroup = new SpriteGroup();

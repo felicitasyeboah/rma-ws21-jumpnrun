@@ -6,6 +6,7 @@ import {GameObject} from "./GameObject.js";
  * Erstellt ein Player-Objekt
  */
 export class Player extends GameObject {
+    playerData: any;
     private playerSprites: any;
     private colsInSpritesheet: number;
     private rowsInSpritesheet: number;
@@ -28,6 +29,7 @@ export class Player extends GameObject {
         super(gameModel, x, y, w, h);
         this.keyState = gameModel.keyState;
 
+        this.playerData = gameModel.playerData;
         this.playerSprites = gameModel.worldImages["tilesetPlayer"];
         this.colsInSpritesheet = 11;
         this.rowsInSpritesheet = 2;
@@ -40,10 +42,10 @@ export class Player extends GameObject {
         // Sprite-width/-height berechnet wird
         this.maxTileY = (this.playerSprites.height / this.spriteHeight) - 1;
 
-        this.w = 24;
-        this.h = 24; // / this.spriteWidth * this.spriteHeight
+        this.w = 32*this.playerData.frames[0].rect[2] / this.playerData.frames[0].rect[3];
+        this.h = 32; // / this.spriteWidth * this.spriteHeight
         this.x = 35;
-        this.y = 212; //gameModel.canvasData.CANVAS_HEIGHT - gameModel.canvasData.TILE_SIZE - this.h;
+        this.y = 376; //gameModel.canvasData.CANVAS_HEIGHT - gameModel.canvasData.TILE_SIZE - this.h;
 
         this._friction = gameModel.friction;
         this._gravity = gameModel.gravity;
@@ -65,7 +67,7 @@ export class Player extends GameObject {
     // Setzt die Playerposition auf seinen Startpunkt zurueck
     resetPlayerPos() {
         this.x = 35;
-        this.y = 212;
+        this.y = 576;
     }
 
     // settz Werte, die beim sterben gesetzt wurden, wieder auf default-werte zurueck und setzt den Spieler zum Startpunkt zureuck
@@ -81,10 +83,10 @@ export class Player extends GameObject {
     move(/*playerDirection: string*/) {
 
         if (this.keyState.left) {
-            this.xVelocity = -5;
+            this.xVelocity = -4;
         }
         if (this.keyState.right) {
-            this.xVelocity = 5;
+            this.xVelocity = 4;
         }
 
         // switch (playerDirection) {
@@ -140,8 +142,7 @@ export class Player extends GameObject {
             this.xVelocity *= this._friction;
         } else {
             this.yVelocity += this._gravity;
-            //this.xVelocity *= this.friction;
-            //  this.yVelocity *= this.friction;
+            this.xVelocity *= this._friction;
         }
 
         if((!this.alive)) {
@@ -156,8 +157,8 @@ export class Player extends GameObject {
         this.move();
         this.xOld = this.x;
         this.yOld = this.y;
-        this.y += this.yVelocity;
         this.x += this.xVelocity;
+        this.y += this.yVelocity;
     }
 
     // Getter and Setters \\
@@ -257,4 +258,5 @@ export class Player extends GameObject {
     set gravity(value: number) {
         this._gravity = value;
     }
+
 }

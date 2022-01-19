@@ -13,7 +13,7 @@ export class GameObject {
     protected xVelocity: number;
     protected yVelocity: number;
 
-    constructor(gameModel: GameModel, x: number, y: number, height: number, width: number) {
+    constructor(gameModel: GameModel, x: number, y: number, width: number, height: number) {
         this.gameModel = gameModel;
         this.x = x;
         this.y = y;
@@ -111,6 +111,13 @@ export class GameObject {
         return this.y;
     }
 
+    getOldX() {
+        return this.xOld;
+    }
+    getOldY() {
+        return this.yOld;
+    }
+
     setX(value: number) {
         this.x = value;
     }
@@ -147,7 +154,7 @@ export class GameObject {
 export class GameItem extends GameObject {
     private _type: string;
     constructor(gameModel: GameModel, x: number, y: number, w: number, h: number, type: string) {
-        super(gameModel, x, y, h, w)
+        super(gameModel, x, y, w, h)
         this.gameModel = gameModel;
         this._type = type;
     }
@@ -213,7 +220,6 @@ export class Enemy extends MovingItem {
             this.moveCounter *= -1;
         }
     }
-
 }
 
 /**

@@ -72,8 +72,8 @@ export default class GameController {
             if (this.state.done) {
                 this.flipState();
             }
-            this.stateController.update();
             this.state.update();
+            this.stateController.update();
             this.renderDisplay();
     }
 
