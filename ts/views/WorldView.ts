@@ -273,15 +273,7 @@ export class WorldView extends State {
                 tile.dw,
                 tile.dh,
             );
-            // this.bufferCtx.drawImage(this.tilesetMap,
-            //     tile * spriteWidth,
-            //     0,
-            //     spriteWidth,
-            //     spriteHeight,
-            //     col * this.tileSize,
-            //     row * this.tileSize,
-            //     this.tileSize,
-            //     this.tileSize);
+
             //this.bufferCtx.strokeStyle = "darkgrey";
             //this.bufferCtx.lineWidth = 0.5;
             //this.bufferCtx.strokeRect(col * this.tileSize, row * this.tileSize, this.tileSize - this.bufferCtx.lineWidth, this.tileSize - this.bufferCtx.lineWidth);
@@ -294,28 +286,16 @@ export class WorldView extends State {
      * @private
      */
     private drawPlayer() {
-        this.bufferCtx.fillStyle = "lightgrey";
-        this.bufferCtx.strokeStyle = "white";
-        this.bufferCtx.lineWidth = 5;
-        this.bufferCtx.fillRect(
+
+        this.bufferCtx.drawImage(this.player.getPlayerSprites(),
+            this.player.playerData.frames[0].rect[0],//getTileX() * this.player.getSpriteWidth(),
+            this.player.playerData.frames[0].rect[1],//this.player.getTileY() * this.player.getSpriteHeight(),
+            this.player.playerData.frames[0].rect[2],//this.player.getSpriteWidth(),
+            this.player.playerData.frames[0].rect[3],//this.player.getSpriteHeight(),
             this.player.getX(),
             this.player.getY(),
-            this.player.getW(),
+            this.player.getW(),// * this.player.playerData.frames[0].rect[2] /this.player.playerData.frames[0].rect[3],
             this.player.getH());
-        this.bufferCtx.strokeRect(
-            this.player.getX() + this.bufferCtx.lineWidth * 0.5,
-            this.player.getY() + this.bufferCtx.lineWidth * 0.5,
-            this.player.getW() - this.bufferCtx.lineWidth,
-            this.player.getH() - this.bufferCtx.lineWidth);
-        // this.ctx.drawImage(this.player.getPlayerSprites(),
-        //     this.player.getTileX() * this.player.getSpriteWidth(),
-        //     this.player.getTileY() * this.player.getSpriteHeight(),
-        //     this.player.getSpriteWidth(),
-        //     this.player.getSpriteHeight(),
-        //     this.player.getX(),
-        //     this.player.getY(),
-        //     this.player.getW(),
-        //     this.player.getH());
     }
 
     private drawEntities() {
@@ -402,7 +382,6 @@ export class WorldView extends State {
 
         this.hudCtx.fillText("TIME " + this._timeToFinishLevel.toString(), this.tileSize * 15.5, 55)
         this.bufferCtx.drawImage(CANVAS_DATA.HUD_CANVAS, 0, 0);
-
     }
 
     /**

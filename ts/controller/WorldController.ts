@@ -6,6 +6,7 @@ import {SpriteGroup} from "../models/objects/SpriteGroup.js";
 import {StateController} from "./StateController.js";
 import {checkHighScore, saveHighScore} from "../highscore_utils.js";
 import {CANVAS_DATA} from "../game_config.js";
+import {TileFinder} from "./TileFinder.js";
 
 /**
  * Der WoldController verwaltet und updated die Daten der WorldView
@@ -26,6 +27,7 @@ export class WorldController extends StateController {
     private coinGroup: SpriteGroup;
     private waterGroup: SpriteGroup;
     private heartGroup: SpriteGroup;
+    tileFinder: TileFinder;
 
     constructor(gameModel: GameModel, protected view: WorldView) {
         super(gameModel);
@@ -43,6 +45,7 @@ export class WorldController extends StateController {
         this.coinGroup = gameModel.getCoinGroup();
         this.waterGroup = gameModel.getWaterGroup();
         this.heartGroup = gameModel.getHeartGroup();
+        this.tileFinder = new TileFinder(gameModel);
     }
 
     /**
@@ -135,7 +138,7 @@ export class WorldController extends StateController {
                 this.handleCollisionObject(this.player);
             }
         }
-        // wenn der spieler ein leben verloren hat, nur playe rupdaten, alles andere ist angehalten
+        // wenn der spieler ein leben verloren hat, nur playerupdaten, alles andere ist angehalten
         else {
             this.player.update();
 
@@ -162,19 +165,19 @@ export class WorldController extends StateController {
             console.log("GameOver. kein neuer Highscore");
             CANVAS_DATA.DIV_GAME_OVER.style.display = "flex";
 
-            if(this.gameModel.getCurrentLevel() < this.gameModel.getMaxLevel()) {
-                CANVAS_DATA.DIV_GAME_OVER.querySelector('div')!.innerText = "Game over! <br/><br/><br/>Your score:<br/><br/>" + this.player.getCoinCounter();
+            if (this.gameModel.getCurrentLevel() < this.gameModel.getMaxLevel()) {
+                CANVAS_DATA.DIV_GAME_OVER.querySelector('div')!.innerHTML = "Game over! <br/><br/><br/>Your score:<br/><br/>" + this.player.getCoinCounter();
             } else if (this.gameModel.getCurrentLevel() == this.gameModel.getMaxLevel()) {
-                CANVAS_DATA.DIV_GAME_OVER.querySelector('div')!.innerText = "You finished game! <br/><br/><br/> Your score:<br/><br/>" + this.player.getCoinCounter();
+                CANVAS_DATA.DIV_GAME_OVER.querySelector('div')!.innerHTML = "You finished game! <br/><br/><br/> Your score:<br/><br/>" + this.player.getCoinCounter();
             }
         }
         // wenn ein neuer Highscore erreich wurde
         else {
             CANVAS_DATA.DIV_NEW_HIGHSCORE.style.display = "flex";
-            if(this.gameModel.getCurrentLevel() < this.gameModel.getMaxLevel()) {
-                CANVAS_DATA.DIV_NEW_HIGHSCORE.querySelector('div')!.innerText = "Game over<br /><br /><br /> New highscore:<br /><br />" + this.player.getCoinCounter();
+            if (this.gameModel.getCurrentLevel() < this.gameModel.getMaxLevel()) {
+                CANVAS_DATA.DIV_NEW_HIGHSCORE.querySelector('div')!.innerHTML = "Game over<br /><br /><br /> New highscore:<br /><br />" + this.player.getCoinCounter();
             } else if (this.gameModel.getCurrentLevel() == this.gameModel.getMaxLevel()) {
-               CANVAS_DATA.DIV_NEW_HIGHSCORE.querySelector('div')!.innerText = "You finished game! <br /><br /><br /> New highscore:<br /><br />" + this.player.getCoinCounter();
+                CANVAS_DATA.DIV_NEW_HIGHSCORE.querySelector('div')!.innerHTML = "You finished game! <br /><br /><br /> New highscore:<br /><br />" + this.player.getCoinCounter();
             }
         }
     }
@@ -250,7 +253,7 @@ export class WorldController extends StateController {
     }
 
     /**
-     * Kollisionsbehandlung eines Objekts mit statischen Hindernissen und der Ganvasbegrenzung
+     * Kollisionsbehandlung eines Objekts
      * @param object
      */
     handleCollisionObject(object: GameObject) {
@@ -274,161 +277,155 @@ export class WorldController extends StateController {
         }
 
         // Tilebased-Collision-Detection: Collision-Handling zur Collision mit einem Tile innerhalb der CollisionMap
-        this.locateCollisionTiles(object);
+        this.checkCollisionWithTile(object);
+        // Pixelbased collision
         this.checkCollisionWithGameObject(object);
     }
 
-    // Localization function - auf was für Tiles (topLeft, topRight, bottomLeft, bottomRight)
-    // befindet sich das Object aktuell
-    locateCollisionTiles(object: GameObject) {
-        let value;
+    /**
+     * checkt ob bei dem Gameobject eine COllision mit Tiles vorliegt, auf denen es sich gerade befindet
+     * @param object GameObject
+     */
+    checkCollisionWithTile(object: GameObject) {
+        let xleft = object.getLeft();
+        let xright = object.getRight();
+        let ytop = object.getTop();
+        let ybottom = object.getBottom();
+        const tiles = this.tileFinder.searchByRange(xleft, xright, ytop, ybottom);
+        tiles.forEach((tile: {
+            tileValue: number,
+            xleft: number,
+            xright: number,
+            ytop: number,
+            ybottom: number
+        }) => {
+            CANVAS_DATA.BUFFER_CTX.strokeStyle = "blue";
+            CANVAS_DATA.BUFFER_CTX.beginPath();
+            CANVAS_DATA.BUFFER_CTX.rect(
+                Math.floor(tile.xleft / CANVAS_DATA.TILE_SIZE) * CANVAS_DATA.TILE_SIZE,
+                Math.floor(tile.ytop / CANVAS_DATA.TILE_SIZE) * CANVAS_DATA.TILE_SIZE,
+                CANVAS_DATA.TILE_SIZE, CANVAS_DATA.TILE_SIZE);
+            CANVAS_DATA.BUFFER_CTX.stroke();
 
-        //wo befindet sich die obere linke Ecke //topTile left
-        value = this.getTopLeftTileValue(object);
-        this.checkCollisionWithTile(value, object, this.columnLeftPosition, this.rowTopPosition);
+            // 11 = c_left, 12 = c_top, 13 = c_right, 14 = c_bottom,
+            // 21 = c_top_left, 22 = c_top_right, 23 = c_top_left_right
+            // 31 = c_bottom_left, 32 = c_bottom_right, 33 = c_bottom_left_right
+            // 41 = c_top_left_right_bottom,
+            // 51 = c_exit, 52 = c_water, 53 = c_coin, 54 = c_enemy
+            // 99 = none,
+            let topTileY: number, rightTileX: number, leftTileX: number,
+                bottomTileY: number;
 
-        // top right
-        value = this.getTopRightTileValue(object);
-        this.checkCollisionWithTile(value, object, this.columnRightPosition, this.rowTopPosition);
+            leftTileX = tile.xleft;
+            topTileY = tile.ytop;
+            rightTileX = tile.xleft + CANVAS_DATA.TILE_SIZE;
+            bottomTileY = tile.ytop + CANVAS_DATA.TILE_SIZE;
 
-        // bottom left
-        value = this.getBottomLeftTileValue(object);
-        this.checkCollisionWithTile(value, object, this.columnLeftPosition, this.rowBottomPosition);
-
-        // bottom right
-        value = this.getBottomRightTileValue(object);
-        this.checkCollisionWithTile(value, object, this.columnRightPosition, this.rowBottomPosition);
+            if (tile.tileValue === undefined) return;
+            switch (tile.tileValue) {
+                case 11: //11 = c_left
+                    this.collidePlatformLeft(object, leftTileX);
+                    break;
+                case 12: //12 = c_top
+                    this.collidePlatformTop(object, topTileY);
+                    break;
+                case 13: //13 = c_right
+                    this.collidePlatformRight(object, rightTileX);
+                    break;
+                case 14: //14 = c_bottom
+                    this.collidePlatformBottom(object, bottomTileY);
+                    break;
+                case 21: //21 = c_top_left
+                    if (this.collidePlatformLeft(object, leftTileX)) return;
+                    this.collidePlatformTop(object, topTileY);
+                    break;
+                case 22: //22 = c_top_right
+                    if (this.collidePlatformRight(object, rightTileX)) return;
+                    this.collidePlatformTop(object, topTileY);
+                    break;
+                case 23: //23 = top_left_right
+                    if (this.collidePlatformRight(object, rightTileX)) return;
+                    if (this.collidePlatformLeft(object, leftTileX)) return;
+                    this.collidePlatformTop(object, topTileY)
+                    break;
+                case 31: // 31 = c_bottom_left
+                    if (this.collidePlatformLeft(object, leftTileX)) return;
+                    this.collidePlatformBottom(object, bottomTileY)
+                    break;
+                case 32: // 32 = c_bottom_right
+                    if (this.collidePlatformRight(object, rightTileX)) return;
+                    this.collidePlatformBottom(object, bottomTileY);
+                    break;
+                case 33: // 33 = c_bottom_left_right
+                    if (this.collidePlatformRight(object, rightTileX)) return;
+                    if (this.collidePlatformLeft(object, leftTileX)) return;
+                    this.collidePlatformBottom(object, bottomTileY)
+                    break;
+                case 41: //41 = top_left_right_bottom
+                    if (this.collidePlatformLeft(object, leftTileX)) return;
+                    if (this.collidePlatformRight(object, rightTileX)) return;
+                    if (this.collidePlatformTop(object, topTileY)) return;
+                    this.collidePlatformBottom(object, bottomTileY);
+                    break;
+                case 51: // 51 = c_exit
+                    this.switchLevel(this.gameModel.getCurrentLevel() + 1);
+                    break;
+                case 52: // 52 = c_water
+                    break;
+                case 53: // 53 = c_coin
+                    break;
+                case 54: // 54 = c_enemy wohl ueberfluessaig, da sich alle bwegen werden
+                    break;
+                case 99:  // 99 = none
+                    break;
+            }
+        })
     }
 
-    /**
-     * Rechnet den x und y position des GameObjects auf dem Canvas in die row und column des tilemap-systems um und gibt
-     * anhand derrer den Wert aus der collisionmap zurueck
-     * @param object GameObject
-     * @return Wert aus der Collisionmap
-     */
-    getTopLeftTileValue(object: GameObject) {
-        this.rowTopPosition = Math.floor(object.getTop() / CANVAS_DATA.TILE_SIZE); // berechnet die row der topPosition  des objects in der TileMap
-        this.columnLeftPosition = Math.floor(object.getLeft() / CANVAS_DATA.TILE_SIZE); // berechnet den column der leftPosition des objects in der TileMap
-        return this.collisionMapData["level" + this.gameModel.getCurrentLevel()][this.rowTopPosition * CANVAS_DATA.COLS + this.columnLeftPosition];
-    }
+    // Collision-Detection: Collision-Handling zur Collision mit einem GameObject
+    checkCollisionWithGameObject(object: GameObject) {
+        this.platformGroup.getSprites().forEach((movingPlatform: MovingPlatform) => {
+            if (this.collideMovingPlatform(object, movingPlatform)) {
+                this.collidePlatformRight(object, movingPlatform.getRight());
+                this.collidePlatformLeft(object, movingPlatform.getLeft());
+                if ((object.getBottom() > movingPlatform.getTop() && object.getOldBottom() <= movingPlatform.getTop())) {
+                    if (movingPlatform.type == "platform") {
+                        object.setBottom(movingPlatform.getTop());
+                        if (object.getBottom() == movingPlatform.getTop()) {
+                            object.setBottom(movingPlatform.getTop() + movingPlatform.moveDirection);
+                        }
+                    }
+                    if (movingPlatform.type == "platform_topping") {
+                        object.setBottom(movingPlatform.getTop());
+                        object.setX(object.getX() + movingPlatform.moveDirection);
+                    }
+                    object.setInTheAir(false);
+                }
+                //this.collidePlatformBottom(object, movingPlatform.getBottom());
 
-    /**
-     * Berechnet das top-right tile in der tilemap des aktuellen Levels und gibt den Wert aus der Collisionmap dieser Position zurück
-     * @param object GameObject
-     * @return Wert aus der Collisionmap
-     */
-    getTopRightTileValue(object: GameObject) {
-        this.rowTopPosition = Math.floor(object.getTop() / CANVAS_DATA.TILE_SIZE);
-        this.columnRightPosition = Math.floor(object.getRight() / CANVAS_DATA.TILE_SIZE);
-        return this.collisionMapData["level" + this.gameModel.getCurrentLevel()][this.rowTopPosition * CANVAS_DATA.COLS + this.columnRightPosition];
-    }
-
-    /**
-     * Berechnet das bottom-teft tile in der tilemap des aktuellen Levels und gibt den Wert aus der Collisionmap dieser Position zurück
-     * @param object GameObject
-     * @return Wert aus der Collisionmap
-     */
-    getBottomLeftTileValue(object: GameObject) {
-        this.rowBottomPosition = Math.floor(object.getBottom() / CANVAS_DATA.TILE_SIZE);
-        this.columnLeftPosition = Math.floor(object.getLeft() / CANVAS_DATA.TILE_SIZE);
-        return this.collisionMapData["level" + this.gameModel.getCurrentLevel()][this.rowBottomPosition * CANVAS_DATA.COLS + this.columnLeftPosition];
-    }
-
-    /**
-     * Berechnet das bottom-right tile aus der tilemap des aktuellen Levels und gibt den Wert aus der Collisionmap dieser Position zurück
-     * @param object GameObject
-     * @return Wert aus der Collisionmap
-     */
-    getBottomRightTileValue(object: GameObject) {
-        this.rowBottomPosition = Math.floor(object.getBottom() / CANVAS_DATA.TILE_SIZE);
-        this.columnRightPosition = Math.floor(object.getRight() / CANVAS_DATA.TILE_SIZE);
-        return this.collisionMapData["level" + this.gameModel.getCurrentLevel()][this.rowBottomPosition * CANVAS_DATA.COLS + this.columnRightPosition];
-    }
-
-    /**
-     *  routing function - Ordnet den Wert des collision-tiles der entsprechenden collision-function zu
-     * @param value Wert des collision-tiles
-     * @param object GameObject
-     * @param column col in der tileMap
-     * @param row row in der tileMap
-     */
-    checkCollisionWithTile(value: number, object: GameObject, column: number, row: number) {
-        // 11 = c_left, 12 = c_top, 13 = c_right, 14 = c_bottom,
-        // 21 = c_top_left, 22 = c_top_right, 23 = c_top_left_right
-        // 31 = c_bottom_left, 32 = c_bottom_right, 33 = c_bottom_left_right
-        // 41 = c_top_left_right_bottom,
-        // 51 = c_exit, 52 = c_water, 53 = c_coin, 54 = c_enemy
-        // 99 = none,
-        let topTileY: number | undefined, rightTileX: number | undefined, leftTileX: number | undefined,
-            bottomTileY: number | undefined;
-
-        leftTileX = column * CANVAS_DATA.TILE_SIZE;
-        topTileY = row * CANVAS_DATA.TILE_SIZE;
-        rightTileX = column * CANVAS_DATA.TILE_SIZE + CANVAS_DATA.TILE_SIZE;
-        bottomTileY = row * CANVAS_DATA.TILE_SIZE + CANVAS_DATA.TILE_SIZE;
-
-        if (value === undefined) return;
-        switch (value) {
-            case 11: //11 = c_left
-                this.collidePlatformLeft(object, leftTileX);
-                break;
-            case 12: //12 = c_top
-                this.collidePlatformTop(object, topTileY);
-                break;
-            case 13: //13 = c_right
-                this.collidePlatformRight(object, rightTileX);
-                break;
-            case 14: //14 = c_bottom
-                this.collidePlatformBottom(object, bottomTileY);
-                break;
-            case 21: //21 = c_top_left
-                if (this.collidePlatformTop(object, topTileY)) return;
-                this.collidePlatformLeft(object, leftTileX);
-                break;
-            case 22: //22 = c_top_right
-                if (this.collidePlatformTop(object, topTileY)) return;
-                this.collidePlatformRight(object, rightTileX);
-                break;
-            case 23: //23 = top_left_right
-                if (this.collidePlatformTop(object, topTileY)) return;
-                if (this.collidePlatformLeft(object, leftTileX)) return;
-                this.collidePlatformRight(object, rightTileX);
-                break;
-            case 31: // 31 = c_bottom_left
-                if (this.collidePlatformBottom(object, bottomTileY)) return;
-                this.collidePlatformLeft(object, leftTileX);
-                break;
-            case 32: // 32 = c_bottom_right
-                if (this.collidePlatformBottom(object, bottomTileY)) return;
-                this.collidePlatformRight(object, rightTileX);
-                break;
-            case 33: // 33 = c_bottom_left_right
-                if (this.collidePlatformBottom(object, bottomTileY)) return;
-                if (this.collidePlatformLeft(object, leftTileX)) return;
-                this.collidePlatformRight(object, rightTileX);
-                break;
-            case 41: //41 = top_left_right_bottom
-                if (this.collidePlatformRight(object, rightTileX)) return;
-                if (this.collidePlatformBottom(object, bottomTileY)) return;
-                if (this.collidePlatformTop(object, topTileY)) return;
-                this.collidePlatformLeft(object, leftTileX);
-                break;
-            case 51: // 51 = c_exit
-                this.switchLevel(this.gameModel.getCurrentLevel() + 1);
-                break;
-            case 52: // 52 = c_water
-                break;
-            case 53: // 53 = c_coin
-                //this.collideCoin(object, tileX, tileY);
-                break;
-            case 54: // 54 = c_enemy wohl ueberfluessaig, da sich alle bwegen werden
-                break;
-            case 99:  // 99 = none
-                break;
+            }
+        });
+        if (object == this.player) {
+            this.enemyGroup.getSprites().forEach((enemy: Enemy) => {
+                if (this.collideEnemy(this.player, enemy)) {
+                    this.player.died();
+                }
+            });
+            this.coinGroup.getSprites().forEach((coin: Coin) => {
+                if (this.collideCoin(this.player, coin)) {
+                    this.coinGroup.delete(coin);
+                    this.player.setCoinCounter(this.player.getCoinCounter() + 1)
+                }
+            });
+            this.waterGroup.getSprites().forEach((water: Water) => {
+                if (this.collideWater(this.player, water)) {
+                    this.player.died();
+                }
+            });
         }
     }
 
-    // Response Functions - Auf die Collission reagieren und Objektposition anpassen
+    // Response Funktionen - Auf die Collission reagieren und Objektposition anpassen
     collidePlatformBottom(object: GameObject, tileBottom: number) {
         if (object.getTop() < tileBottom && object.getOldTop() >= tileBottom) {
             object.setTop(tileBottom);
@@ -470,77 +467,33 @@ export class WorldController extends StateController {
     }
 
     collideCoin(object: GameObject, coin: Coin) {
-        if (this.player.getLeft() < coin.getRight() &&
+        return this.player.getLeft() < coin.getRight() &&
             this.player.getRight() > coin.getLeft() &&
             this.player.getBottom() > coin.getTop() &&
-            this.player.getTop() < coin.getBottom()) {
-            return true;
-        }
-        return false;
+            this.player.getTop() < coin.getBottom();
     }
 
     collideEnemy(object: GameObject, enemy: Enemy) {
-        if (this.player.getLeft() < enemy.getRight() &&
+        return this.player.getLeft() < enemy.getRight() &&
             this.player.getRight() > enemy.getLeft() &&
             this.player.getTop() < enemy.getBottom() &&
-            this.player.getBottom() > enemy.getTop()) {
-            return true;
-        }
-        return false;
+            this.player.getBottom() > enemy.getTop();
+
     }
 
     collideWater(object: GameObject, water: Water) {
-        if (this.player.getLeft() < water.getRight() &&
+        return this.player.getLeft() < water.getRight() &&
             this.player.getRight() > water.getLeft() &&
             this.player.getTop() < water.getBottom() &&
-            this.player.getBottom() > water.getTop()) {
-            return true;
-        }
-        return false;
+            this.player.getBottom() > water.getTop();
+
     }
 
     collideMovingPlatform(object: GameObject, movingPlatform: MovingPlatform) {
-        if (object.getTop() < movingPlatform.getBottom() &&
+        return object.getTop() < movingPlatform.getBottom() &&
             object.getBottom() > movingPlatform.getTop() &&
             object.getRight() > movingPlatform.getLeft() &&
-            object.getLeft() < movingPlatform.getRight()) {
-            return true;
-        }
-        return false;
-    }
+            object.getLeft() < movingPlatform.getRight();
 
-// Collision-Detection: Collision-Handling zur Collision mit einem GameObject
-    checkCollisionWithGameObject(object: GameObject) {
-        this.platformGroup.getSprites().forEach((movingPlatform: MovingPlatform) => {
-            if (this.collideMovingPlatform(object, movingPlatform)) {
-                if (movingPlatform.type == "platform") {
-                    object.setBottom(movingPlatform.getTop() - 0.1);
-                }
-                if (movingPlatform.type == "platform_topping") {
-                    object.setBottom(movingPlatform.getTop() - 0.1);
-                    //  object.setXVelocity(0);
-                    object.setX(object.getX() + movingPlatform.moveDirection);
-                }
-                object.setInTheAir(false);
-            }
-        });
-        if (object == this.player) {
-            this.enemyGroup.getSprites().forEach((enemy: Enemy) => {
-                if (this.collideEnemy(this.player, enemy)) {
-                    this.player.died();
-                }
-            });
-            this.coinGroup.getSprites().forEach((coin: Coin) => {
-                if (this.collideCoin(this.player, coin)) {
-                    this.coinGroup.delete(coin);
-                    this.player.setCoinCounter(this.player.getCoinCounter() + 1)
-                }
-            });
-            this.waterGroup.getSprites().forEach((water: Water) => {
-                if (this.collideWater(this.player, water)) {
-                    this.player.died();
-                }
-            });
-        }
     }
 }
