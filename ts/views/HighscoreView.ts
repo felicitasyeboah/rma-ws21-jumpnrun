@@ -37,11 +37,11 @@ export default class HighscoreView extends State {
             this.buttonHeight,
             6,
             17,
-            '#FEA443', 0.9,
-            'blue', 7,
+            undefined, 1,
+            'white', 7,
             this.font,
             "BACK TO MENU",
-            "blue");
+            "white");
         this._buttonGroup.set(this._btnBackToMenu.name, this._btnBackToMenu);
         this._activeButton = this._btnBackToMenu;
     }

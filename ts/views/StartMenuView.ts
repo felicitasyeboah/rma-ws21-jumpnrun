@@ -33,11 +33,11 @@ export default class StartMenuView extends State {
             this.buttonHeight,
             6,
             7.5,
-            '#FEA443', 0.9,
-            'blue', 7,
+            '#FEA443', undefined,
+            '#3b899f', 7,
             this.font,
             "START GAME",
-            "blue");
+            "#3b899f");
 
         this._btnHighscore = new Button(
             'highscore',
@@ -69,8 +69,7 @@ export default class StartMenuView extends State {
         this._activeButton = this._btnStartGame;
     }
     private _drawButtons() {
-        let x = 6 * CANVAS_DATA.TILE_SIZE;
-        let yStart = 7.5 * CANVAS_DATA.TILE_SIZE;
+         let yStart = 7.5 * CANVAS_DATA.TILE_SIZE;
         let spacer = 2;
         this.buttonGroup.forEach((button) => {
 
@@ -106,15 +105,8 @@ export default class StartMenuView extends State {
                 this.bufferCtx.textBaseline = "middle";
                 this.bufferCtx.fillText(button.text, button.x + button.width/2, button.y + button.height/2);
             }
-
-//console.log(button.boundingBoxHeight, button.boundingBoxWidth, button.boundingBoxX, button.boundingBoxY);
-
-            //button.drawButton(button.name!, this.bufferCtx, x, yStart);
             yStart += spacer;
         })
-        // this.btnStartGame.drawButton('start_game', this.bufferCtx, 6, 9);
-        // this.btnHighscore.drawButton('highscore', this.bufferCtx, 6, 11);
-        // this.btnInstruction.drawButton('instruction', this.bufferCtx, 6, 13);
     }
     private _drawBackground() {
         this.bufferCtx.drawImage(

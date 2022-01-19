@@ -3,7 +3,6 @@ import {GameModel} from "../models/GameModel.js";
 import StartMenuView from "../views/StartMenuView.js";
 import Button from "../models/Button.js";
 import {CANVAS_DATA} from "../game_config.js";
-//TODO: eintragen, was das bei highscore die highscoreview und bei instruction die instructionview geladen wird
 /*
     Verarbeitet Benutzereingaben per Maus oder Tastatur,
     passt Daten des Models an und aktualisiert die StartMenuView
@@ -85,7 +84,6 @@ export class StartMenuController extends StateController {
 
             if (this.mouseOverlapsButton(mousePos, btn)) {
                 this.handleSelectedButton(btn);
-                console.log("button clicked", btn.name);
             }
         });
     }
@@ -100,13 +98,11 @@ export class StartMenuController extends StateController {
                 break;
             case 'highscore':
                 this.view.next = btn.name;
-                console.log('highscore switch case');
                 this.view.done = true;
 
                 break;
             case 'instruction':
                 this.view.next = btn.name;
-                console.log('instruction switch case');
                 break;
         }
     }
@@ -129,12 +125,11 @@ export class StartMenuController extends StateController {
             btn.fontColor = 'white';
             btn.borderColor = 'white';
         });
-        btn.alpha = 0.9;
+        btn.alpha = 1;
         btn.bodyColor = '#FEA443';
-        btn.fontColor = 'blue';
-        btn.borderColor = 'blue';
+        btn.fontColor = '#3b899f';
+        btn.borderColor = '#3b899f';
         this.view.activeButton = btn;
-        console.log("overlaps", btn.name);
     }
 
     //wechselt die Buttons per Keyboard abwaerts

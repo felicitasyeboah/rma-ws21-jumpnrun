@@ -83,26 +83,20 @@ export class HighscoreController extends StateController {
                 this.highlightButton(btn);
             } else if(!this.mouseOverlapsButton(mousePos, btn)) {
                 this.view.buttonGroup.forEach((btn: Button) => {
-                    // btn.bodyColor = undefined;
+                    btn.bodyColor = undefined;
                     // btn.alpha = 1;
-                    btn.fontColor = 'blue';
-                    // btn.borderColor = 'white';
+                    btn.fontColor = 'white';
+                    btn.borderColor = 'white';
                 });
             }
         });
     }
     // highlightet den ausgewählten button
     highlightButton(btn: Button) {
-        // this.view.buttonGroup.forEach((btn: Button) => {
-        //     btn.bodyColor = undefined;
-        //     btn.alpha = 1;
-        //     btn.fontColor = 'white';
-        //     btn.borderColor = 'white';
-        // });
-        btn.alpha = 0.9;
+        btn.alpha = 1;
         btn.bodyColor = '#FEA443';
-        btn.fontColor = 'white';
-        btn.borderColor = 'blue';
+        btn.fontColor = '#3b899f';
+        btn.borderColor = '#3b899f';
         this.view.activeButton = btn;
     }
     update(): void {

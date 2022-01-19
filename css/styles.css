@@ -119,26 +119,28 @@ button {
     justify-content: flex-start;
     align-items: center;
     position: absolute;
-    color: blue; /*3cbfee #FEA443;*/
+    color: #3b899f; /*3cbfee #FEA443;*/
     padding: 5% 2%;
-    min-width: 80%;
-    max-width: 90%;
-    min-height: 80%;
-    max-height:80%;
-    border: 3px solid red;
+    min-width: 75%;
+    max-width: 85%;
+    min-height: 50%;
+    max-height: 50%;
     align-self: center;
+    background-color: #f3f3f3;
+    border-radius: 1%;
+    border: 5px solid #3b899f;
 }
 #highscore > h2 {
     font-size: 2.7vmin;
-    padding:5% 0 5% 0;
+    padding:4% 0 0 0;
     height:fit-content;
 }
 #highscore > ol {
-    border: 1px dashed white;
-    padding: 5% 5% 3% 10%;
+    list-style-type: decimal-leading-zero;
+    padding: 5% 5% 3% 15%;
     font-size: 2.3vmin;
     height:fit-content;
 }
 #highscore > ol > li {
-    margin-bottom: 2%;
+    margin: 3% 0;
 }
