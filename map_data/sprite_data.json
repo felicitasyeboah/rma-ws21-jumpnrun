@@ -3,66 +3,79 @@
     "x": 0,
     "y": 0,
     "w": 64,
-    "h": 64
+    "h": 64,
+    "type": "ground"
   },
   "ground_top": {
     "x": 64,
     "y": 0,
     "w": 64,
-    "h": 64
+    "h": 64,
+    "type": "ground"
   },
   "slime": {
     "x": 128,
     "y": 19,
     "w": 64,
-    "h": 45
+    "h": 45,
+    "type": "slime",
+    "frames": 5
   },
   "heart_full": {
     "x": 128,
     "y": 0,
     "w": 21,
-    "h": 18
+    "h": 18,
+    "type": "heart"
   },
   "heart_half": {
     "x": 149,
     "y": 0,
     "w": 22,
-    "h": 18
+    "h": 18,
+    "type": "heart_half"
   },
   "heart_empty": {
     "x": 171,
     "y": 0,
     "w": 21,
-    "h": 18
+    "h": 18,
+    "type": "heart_empty"
   },
-  "platform_topping": {
+  "movingPlatformX": {
     "x": 192,
     "y": 0,
     "w": 64,
-    "h": 37
+    "h": 37,
+    "type": "movingPlatformX"
   },
-  "platform": {
+  "movingPlatformY": {
     "x": 256,
     "y": 0,
     "w": 64,
-    "h": 37
+    "h": 37,
+    "type": "movingPlatformY"
   },
   "water": {
     "x": 320,
     "y": 23,
     "w": 64,
-    "h": 41
+    "h": 41,
+    "type": "water"
   },
   "coin": {
     "x": 384,
     "y": 0,
-    "w": 24,
-    "h": 24
+    "w": 16,
+    "h": 16,
+    "type": "coin",
+    "frames":4
   },
-  "exit": {
+  "door": {
     "x": 448,
     "y": 0,
     "w": 64,
-    "h": 64
+    "h": 64,
+    "type": "door"
   }
 }

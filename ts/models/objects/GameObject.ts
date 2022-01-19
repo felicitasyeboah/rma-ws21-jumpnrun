@@ -12,18 +12,22 @@ export class GameObject {
     protected inTheAir: boolean;
     protected xVelocity: number;
     protected yVelocity: number;
+    frames: number;
+    spriteData: any;
 
-    constructor(gameModel: GameModel, x: number, y: number, width: number, height: number) {
+    constructor(gameModel: GameModel, x: number, y: number) {
         this.gameModel = gameModel;
+        this.spriteData = gameModel.spriteData;
         this.x = x;
         this.y = y;
         this.xOld = x;
         this.yOld = y;
-        this.w = width;
-        this.h = height;
+        this.w = 0;
+        this.h = 0;
         this.inTheAir = true;
         this.xVelocity = 0;
         this.yVelocity = 0;
+        this.frames = 0;
     }
 
     update() {
@@ -151,12 +155,11 @@ export class GameObject {
     }
 }
 
-export class GameItem extends GameObject {
-    private _type: string;
-    constructor(gameModel: GameModel, x: number, y: number, w: number, h: number, type: string) {
-        super(gameModel, x, y, w, h)
+abstract class GameItem extends GameObject {
+    abstract _type: string;
+    protected constructor(gameModel: GameModel, x: number, y: number) {
+        super(gameModel, x, y,)
         this.gameModel = gameModel;
-        this._type = type;
     }
 
     get type(): string {
@@ -165,49 +168,76 @@ export class GameItem extends GameObject {
 }
 
 export class Water extends GameItem {
-    constructor(gameModel: GameModel, x: number, y: number, w: number, h: number, type: string) {
-        super(gameModel, x, y, w, h, type);
+    constructor(gameModel: GameModel, x: number, y: number) {
+        super(gameModel, x, y,);
+        this.w = CANVAS_DATA.TILE_SIZE;
+        this.h = CANVAS_DATA.TILE_SIZE / this.spriteData.water.w * this.spriteData.water.h;
+        this._type = this.spriteData.water.type;
     }
+
+    _type: string;
 }
 
 export class Coin extends GameItem {
-    constructor(gameModel: GameModel, x: number, y: number, w: number, h: number, type: string) {
-        super(gameModel, x, y, w, h, type);
+    constructor(gameModel: GameModel, x: number, y: number) {
+        super(gameModel, x, y);
+
+        this.w = this.spriteData.coin.w * 0.7;
+        this.h = this.spriteData.coin.h * 0.7;
+        this._type = this.spriteData.coin.type;
+        this.frames = this.spriteData.coin.frames;
+
     }
+
+    _type: string;
 }
 
 export class Heart extends GameItem {
-    constructor(gameModel: GameModel, x: number, y: number, w: number, h: number, type: string) {
-        super(gameModel, x, y, w, h, type);
+    constructor(gameModel: GameModel, x: number, y: number, type: string) {
+        super(gameModel, x, y);
+        this.w = this.spriteData.heart_full.w / 1.5;
+        this.h = this.spriteData.heart_full.h / 1.5;
+        this._type = type;
     }
+    _type: string;
 }
 
-export class Exit extends GameItem {
-    constructor(gameModel: GameModel, x: number, y: number, w: number, h: number, type: string) {
-        super(gameModel, x, y, w, h, type);
+export class Door extends GameItem {
+    constructor(gameModel: GameModel, x: number, y: number) {
+        super(gameModel, x, y);
+        this.w = CANVAS_DATA.TILE_SIZE;
+        this.h = CANVAS_DATA.TILE_SIZE / this.spriteData.door.w * this.spriteData.door.h;
+        this._type = this.spriteData.door.type;
     }
+    _type: string;
 }
 
 /**
  * Oberklasse für bewegende Items der Karte
  */
-class MovingItem extends GameItem {
+abstract class MovingItem extends GameItem {
     moveDirection: number;
     moveCounter: number
 
-    constructor(gameModel: GameModel, x: number, y: number, w: number, h: number, type: string) {
-        super(gameModel, x, y, w, h, type);
+    protected constructor(gameModel: GameModel, x: number, y: number) {
+        super(gameModel, x, y);
         this.moveDirection = 1; // 1 = nach rechts, -1 = nach links
         this.moveCounter = 0;
+        this._type ="";
     }
+
+    _type: string;
 }
 
 /**
  * Gegnerobjekt, das sich bewegt.
  */
 export class Enemy extends MovingItem {
-    constructor(gameModel: GameModel, x: number, y: number, w: number, h: number, type: string) {
-        super(gameModel, x, y, w, h, type);
+    constructor(gameModel: GameModel, x: number, y: number, type: string) {
+        super(gameModel, x, y);
+        this.w = CANVAS_DATA.TILE_SIZE;
+        this.h = CANVAS_DATA.TILE_SIZE / this.spriteData.slime.w * this.spriteData.slime.h
+        this._type = type;
     }
 
 
@@ -220,25 +250,30 @@ export class Enemy extends MovingItem {
             this.moveCounter *= -1;
         }
     }
+
+    _type: string;
 }
 
 /**
  * Bewegliche Platform
  */
 export class MovingPlatform extends MovingItem {
-    private moveX: number; // 1 = gesetzt (bewegt sich), 0 = ungesetzt(bewegt sich nicht)
-    private moveY: number; // 1 = gesetzt (bewegt sich), 0 = ungesetzt(bewegt sich nicht)
-    constructor(gameModel: GameModel, x: number, y: number, w: number, h: number, moveX: number, moveY: number, type: string) {
-        super(gameModel, x, y, w, h, type);
-        this.moveX = moveX;
-        this.moveY = moveY;
-
+    _type: string;
+    private _moveX: number; // 1 = gesetzt (bewegt sich), 0 = ungesetzt(bewegt sich nicht)
+    private _moveY: number; // 1 = gesetzt (bewegt sich), 0 = ungesetzt(bewegt sich nicht)
+    constructor(gameModel: GameModel, x: number, y: number, moveX: number, moveY: number, type: string) {
+        super(gameModel, x, y);
+        this._moveX = moveX;
+        this._moveY = moveY;
+        this.w = CANVAS_DATA.TILE_SIZE;
+        this.h = CANVAS_DATA.TILE_SIZE / this.spriteData.movingPlatformX.w * this.spriteData.movingPlatformX.h;
+        this._type = type;
     }
 
     //kann auch Updatefunktion werden
     update() {
-        this.x += this.moveDirection * this.moveX;
-        this.y += this.moveDirection * this.moveY;
+        this.x += this.moveDirection * this._moveX;
+        this.y += this.moveDirection * this._moveY;
         this.moveCounter++;
         if (this.moveCounter > CANVAS_DATA.TILE_SIZE) {
             this.moveDirection *= -1;
@@ -247,5 +282,12 @@ export class MovingPlatform extends MovingItem {
     }
 
 
+    get moveX(): number {
+        return this._moveX;
+    }
+
+    get moveY(): number {
+        return this._moveY;
+    }
 }
 

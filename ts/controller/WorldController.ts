@@ -299,13 +299,13 @@ export class WorldController extends StateController {
             ytop: number,
             ybottom: number
         }) => {
-            CANVAS_DATA.BUFFER_CTX.strokeStyle = "blue";
-            CANVAS_DATA.BUFFER_CTX.beginPath();
-            CANVAS_DATA.BUFFER_CTX.rect(
-                Math.floor(tile.xleft / CANVAS_DATA.TILE_SIZE) * CANVAS_DATA.TILE_SIZE,
-                Math.floor(tile.ytop / CANVAS_DATA.TILE_SIZE) * CANVAS_DATA.TILE_SIZE,
-                CANVAS_DATA.TILE_SIZE, CANVAS_DATA.TILE_SIZE);
-            CANVAS_DATA.BUFFER_CTX.stroke();
+            // CANVAS_DATA.BUFFER_CTX.strokeStyle = "blue";
+            // CANVAS_DATA.BUFFER_CTX.beginPath();
+            // CANVAS_DATA.BUFFER_CTX.rect(
+            //     Math.floor(tile.xleft / CANVAS_DATA.TILE_SIZE) * CANVAS_DATA.TILE_SIZE,
+            //     Math.floor(tile.ytop / CANVAS_DATA.TILE_SIZE) * CANVAS_DATA.TILE_SIZE,
+            //     CANVAS_DATA.TILE_SIZE, CANVAS_DATA.TILE_SIZE);
+            // CANVAS_DATA.BUFFER_CTX.stroke();
 
             // 11 = c_left, 12 = c_top, 13 = c_right, 14 = c_bottom,
             // 21 = c_top_left, 22 = c_top_right, 23 = c_top_left_right
@@ -389,13 +389,13 @@ export class WorldController extends StateController {
                 this.collidePlatformRight(object, movingPlatform.getRight());
                 this.collidePlatformLeft(object, movingPlatform.getLeft());
                 if ((object.getBottom() > movingPlatform.getTop() && object.getOldBottom() <= movingPlatform.getTop())) {
-                    if (movingPlatform.type == "platform") {
+                    if (movingPlatform.moveY) {
                         object.setBottom(movingPlatform.getTop());
                         if (object.getBottom() == movingPlatform.getTop()) {
                             object.setBottom(movingPlatform.getTop() + movingPlatform.moveDirection);
                         }
                     }
-                    if (movingPlatform.type == "platform_topping") {
+                    if (movingPlatform.moveX) {
                         object.setBottom(movingPlatform.getTop());
                         object.setX(object.getX() + movingPlatform.moveDirection);
                     }

@@ -1,5 +1,5 @@
 import {GameModel} from "../GameModel.js";
-import {keyState} from "../../game_config.js";
+import {CANVAS_DATA, keyState} from "../../game_config.js";
 import {GameObject} from "./GameObject.js";
 
 /**
@@ -22,11 +22,13 @@ export class Player extends GameObject {
     private alive: boolean;
     private lifeCounter: number;
     private coinCounter: number;
+    frames: number;
+    currentFrame: number;
 
     keyState: keyState;
 
     constructor(gameModel: GameModel, x: number, y: number, w: number, h: number) {
-        super(gameModel, x, y, w, h);
+        super(gameModel, x, y);
         this.keyState = gameModel.keyState;
 
         this.playerData = gameModel.playerData;
@@ -42,10 +44,10 @@ export class Player extends GameObject {
         // Sprite-width/-height berechnet wird
         this.maxTileY = (this.playerSprites.height / this.spriteHeight) - 1;
 
-        this.w = 32*this.playerData.frames[0].rect[2] / this.playerData.frames[0].rect[3];
-        this.h = 32; // / this.spriteWidth * this.spriteHeight
+        this.w = 42 * this.spriteWidth / this.spriteHeight;//*this.playerData.frames[0].rect[2] / this.playerData.frames[0].rect[3];
+        this.h = 42; // / this.spriteWidth * this.spriteHeight
         this.x = 35;
-        this.y = 376; //gameModel.canvasData.CANVAS_HEIGHT - gameModel.canvasData.TILE_SIZE - this.h;
+        this.y = CANVAS_DATA.GAME_HEIGHT - CANVAS_DATA.TILE_SIZE - this.h;
 
         this._friction = gameModel.friction;
         this._gravity = gameModel.gravity;
@@ -55,6 +57,9 @@ export class Player extends GameObject {
         this.coinCounter = 0;
 
         this.jumpHeight = -17;
+
+        this.frames = 10;
+        this.currentFrame = 0;
     }
 
     // Wenn setzt geaenderten Werte auf die Default-Werte zurueck
@@ -67,7 +72,7 @@ export class Player extends GameObject {
     // Setzt die Playerposition auf seinen Startpunkt zurueck
     resetPlayerPos() {
         this.x = 35;
-        this.y = 576;
+        this.y = CANVAS_DATA.GAME_HEIGHT - CANVAS_DATA.TILE_SIZE - this.h;
     }
 
     // settz Werte, die beim sterben gesetzt wurden, wieder auf default-werte zurueck und setzt den Spieler zum Startpunkt zureuck
@@ -77,6 +82,7 @@ export class Player extends GameObject {
         this._friction = 0.6;
         this.alive = true;
     }
+
     /**
      * Bewegt den Spieler
      */
@@ -84,9 +90,18 @@ export class Player extends GameObject {
 
         if (this.keyState.left) {
             this.xVelocity = -4;
+            this.tileY = 1;
+            this.xVelocity -= 1;
+            if (this.currentFrame >= this.frames) this.currentFrame = 0;
+            else this.currentFrame++;
+
+
         }
         if (this.keyState.right) {
             this.xVelocity = 4;
+            this.tileY = 0
+            if (this.currentFrame >= this.frames) this.currentFrame = 0;
+            else this.currentFrame++;
         }
 
         // switch (playerDirection) {
@@ -145,13 +160,13 @@ export class Player extends GameObject {
             this.xVelocity *= this._friction;
         }
 
-        if((!this.alive)) {
-            if(this.y <= 96) {
+        if ((!this.alive)) {
+            if (this.y <= 96) {
                 this.yVelocity = 0;
                 this.y = 96;
                 this.xVelocity = 0;
             }
-         }
+        }
 
         this.inTheAir = true;
         this.move();
@@ -222,12 +237,15 @@ export class Player extends GameObject {
     getMaxTileY() {
         return this.maxTileY;
     }
+
     getAlive() {
         return this.alive;
     }
+
     setAlive(value: boolean) {
         this.alive = value;
     }
+
     getCoinCounter() {
         return this.coinCounter;
     }
@@ -235,9 +253,11 @@ export class Player extends GameObject {
     setCoinCounter(value: number) {
         this.coinCounter = value;
     }
+
     getLifeCounter() {
         return this.lifeCounter;
     }
+
     setLifeCounter(value: number) {
         this.lifeCounter = value;
     }

@@ -42,10 +42,10 @@ function loadEntities() {
 
         // Bilder Laden:
         // Player Spritesheet
-        {id: "tilesetPlayer", src: "img/player_spritesheet.png"},
+        {id: "tilesetPlayer", src: "img/player_sprite.png"},
 
         // Tilemap Spritesheet
-        {id: "tilesetMap", src: "img/tileset_64x512.png"},
+        {id: "tilesetMap", src: "img/tileset_64x512_n.png"},
 
         // Background Game
         {id: "background", src: "img/background.png"},

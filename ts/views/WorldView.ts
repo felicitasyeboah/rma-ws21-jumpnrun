@@ -1,7 +1,7 @@
 import {State} from './State.js';
 import {GameModel} from "../models/GameModel.js";
 import {Player} from "../models/objects/Player.js";
-import {Coin, Enemy, GameItem, MovingPlatform, Water} from "../models/objects/GameObject.js";
+import {Coin, Door, Enemy, Heart, MovingPlatform, Water} from "../models/objects/GameObject.js";
 import {SpriteGroup} from "../models/objects/SpriteGroup.js";
 import {CANVAS_DATA} from "../game_config.js";
 
@@ -110,43 +110,49 @@ export class WorldView extends State {
                 if (tile == 0) {
                     this._tileList.push({
                         type: "ground_blank",
-                        dx: col * this.tileSize,
-                        dy: row * this.tileSize,
-                        dw: this.tileSize,
-                        dh: this.tileSize,
+                        x: col * this.tileSize,
+                        y: row * this.tileSize,
+                        w: this.tileSize,
+                        h: this.tileSize,
                     });
                 }
                 // ground_top
                 if (tile == 1) {
                     this._tileList.push({
                         type: "ground_top",
-                        dx: col * this.tileSize,
-                        dy: row * this.tileSize,
-                        dw: this.tileSize,
-                        dh: this.tileSize,
+                        x: col * this.tileSize,
+                        y: row * this.tileSize,
+                        w: this.tileSize,
+                        h: this.tileSize,
                     });
                 }
                 // SLIME            // scaleSize = this.tileSize / w*h
                 if (tile == 2) {
                     let slime = new Enemy(this.gameModel,
                         col * this.tileSize,
-                        row * this.tileSize + this.tileSize - this.tileSize / this.spriteData["slime"].w * this.spriteData["slime"].h,
-                        this.tileSize,
-                        this.tileSize / this.spriteData["slime"].w * this.spriteData["slime"].h,
-                        "slime")
+                        row * this.tileSize + this.tileSize - this.tileSize / this.spriteData.slime.w * this.spriteData.slime.h,
+                        this.spriteData.slime.type)
                     this.enemyGroup.add(slime);
                 }
                 // Platform mit streuseln
                 if (tile == 3) {
 
-                    let platform = new MovingPlatform(this.gameModel, col * this.tileSize, row * this.tileSize, this.tileSize,
-                        this.tileSize / this.spriteData["platform_topping"].w * this.spriteData["platform_topping"].h, 1, 0, "platform_topping");
+                    let platform = new MovingPlatform(this.gameModel,
+                        col * this.tileSize,
+                        row * this.tileSize,
+                        1,
+                        0,
+                        "movingPlatformX");
                     this.platformGroup.add(platform);
                 }
                 // tile 4  = plattform ohne streusel
                 if (tile == 4) {
-                    let platform = new MovingPlatform(this.gameModel, col * this.tileSize, row * this.tileSize, this.tileSize,
-                        this.tileSize / this.spriteData["platform"].w * this.spriteData["platform"].h, 0, 1, "platform");
+                    let platform = new MovingPlatform(this.gameModel,
+                        col * this.tileSize,
+                        row * this.tileSize,
+                        0,
+                        1,
+                        "movingPlatformY");
                     this.platformGroup.add(platform);
                 }
 
@@ -155,36 +161,37 @@ export class WorldView extends State {
                     let water = new Water(
                         this.gameModel,
                         col * this.tileSize,
-                        row * this.tileSize + this.tileSize - this.tileSize / this.spriteData["water"].w * this.spriteData["water"].h,
-                        this.tileSize,
-                        this.tileSize / this.spriteData["water"].w * this.spriteData["water"].h,
-                        "water");
+                        row * this.tileSize + this.tileSize - this.tileSize / this.spriteData.water.w * this.spriteData.water.h
+                        );
                     this.waterGroup.add(water);
                 }
 
                 // TILE 6 = COIN
                 if (tile == 6) {
                     let coin = new Coin(this.gameModel,
-                        col * this.tileSize + (this.tileSize / 2) - this.spriteData["coin"].w / 4,
-                        row * this.tileSize,
-                        this.spriteData["coin"].w / 2,
-                        this.spriteData["coin"].h / 2,
-                        "coin");
+                        col * this.tileSize + (this.tileSize / 2) - this.spriteData.coin.w * 0.3,
+                        row * this.tileSize);
                     this.coinGroup.add(coin);
                 }
 
-                // TILE 7 = EXIT
+                // TILE 7 = DOOR
                 if (tile == 7) {
-                    this._tileList.push({
+                    const door = new Door(
+                        this.gameModel,
+                        col * this.tileSize,
+                        row * this.tileSize);
+                    this._tileList.push(
+                        door);/*{
                         type: "exit",
                         dx: col * this.tileSize,
                         dy: row * this.tileSize,
                         dw: this.tileSize,
                         dh: this.tileSize / this.spriteData["exit"].w * this.spriteData["exit"].h,
-                    });
+                    });*/
                 }
             }
         }
+        console.log(this._tileList);
     }
 
     // Init HUD
@@ -193,49 +200,34 @@ export class WorldView extends State {
         // HUD Coin Count
         let hudCoin = new Coin(this.gameModel,
             this.tileSize * 12.5,
-            43,
-            this.spriteData["coin"].w / 2,
-            this.spriteData["coin"].h / 2,
-            "coin");
+            43);
         this.coinGroup.add(hudCoin);
 
         // HUD Life count
-        let hudHeartFull1L = new GameItem(this.gameModel,
+        let hudHeartFull1L = new Heart(this.gameModel,
             this.tileSize * 3.5,
             42,
-            this.spriteData["heart_full"].w / 1.5,
-            this.spriteData["heart_full"].h / 1.5,
             "heart_full");
 
-        let hudHeartFull2L = new GameItem(this.gameModel,
+        let hudHeartFull2L = new Heart(this.gameModel,
             hudHeartFull1L.getX() + hudHeartFull1L.getW() + spacing,
             42,
-            this.spriteData["heart_full"].w / 1.5,
-            this.spriteData["heart_full"].h / 1.5,
             "heart_full");
-        let hudHeartFull3L = new GameItem(this.gameModel,
+        let hudHeartFull3L = new Heart(this.gameModel,
             hudHeartFull2L.getX() + hudHeartFull2L.getW() + spacing,
             42,
-            this.spriteData["heart_full"].w / 1.5,
-            this.spriteData["heart_full"].h / 1.5,
             "heart_full");
-        let hudHeart1L = new GameItem(this.gameModel,
+        let hudHeart1L = new Heart(this.gameModel,
             this.tileSize * 3.5,
             42,
-            this.spriteData["heart_empty"].w / 1.5,
-            this.spriteData["heart_empty"].h / 1.5,
             "heart_empty");
-        let hudHeart2L = new GameItem(this.gameModel,
+        let hudHeart2L = new Heart(this.gameModel,
             hudHeart1L.getX() + hudHeart1L.getW() + spacing,
             42,
-            this.spriteData["heart_empty"].w / 1.5,
-            this.spriteData["heart_empty"].h / 1.5,
             "heart_empty");
-        let hudHeart3L = new GameItem(this.gameModel,
+        let hudHeart3L = new Heart(this.gameModel,
             hudHeart2L.getX() + hudHeart2L.getW() + spacing,
             42,
-            this.spriteData["heart_empty"].w / 1.5,
-            this.spriteData["heart_empty"].h / 1.5,
             "heart_empty");
 
         this.heartGroup.add(hudHeart1L);
@@ -268,10 +260,10 @@ export class WorldView extends State {
                 this.spriteData[tile.type].y,
                 this.spriteData[tile.type].w,
                 this.spriteData[tile.type].h,
-                tile.dx,
-                tile.dy,
-                tile.dw,
-                tile.dh,
+                tile.x,
+                tile.y,
+                tile.w,
+                tile.h,
             );
 
             //this.bufferCtx.strokeStyle = "darkgrey";
@@ -287,15 +279,18 @@ export class WorldView extends State {
      */
     private drawPlayer() {
 
-        this.bufferCtx.drawImage(this.player.getPlayerSprites(),
-            this.player.playerData.frames[0].rect[0],//getTileX() * this.player.getSpriteWidth(),
-            this.player.playerData.frames[0].rect[1],//this.player.getTileY() * this.player.getSpriteHeight(),
-            this.player.playerData.frames[0].rect[2],//this.player.getSpriteWidth(),
-            this.player.playerData.frames[0].rect[3],//this.player.getSpriteHeight(),
-            this.player.getX(),
-            this.player.getY(),
-            this.player.getW(),// * this.player.playerData.frames[0].rect[2] /this.player.playerData.frames[0].rect[3],
-            this.player.getH());
+        // this.bufferCtx.drawImage(this.player.getPlayerSprites(),
+        //     this.player.playerData.frames[0].rect[0],//getTileX() * this.player.getSpriteWidth(),
+        //     this.player.playerData.frames[0].rect[1],//this.player.getTileY() * this.player.getSpriteHeight(),
+        //     this.player.playerData.frames[0].rect[2],//this.player.getSpriteWidth(),
+        //     this.player.playerData.frames[0].rect[3],//this.player.getSpriteHeight(),
+        //     this.player.getX(),
+        //     this.player.getY(),
+        //     this.player.getW(),// * this.player.playerData.frames[0].rect[2] /this.player.playerData.frames[0].rect[3],
+        //     this.player.getH());
+
+        this.bufferCtx.drawImage(this.player.getPlayerSprites(), 72 * this.player.currentFrame, 97 * this.player.getTileY(), 72, 97, this.player.getX(), this.player.getY(),
+            this.player.getW(), this.player.getH());
     }
 
     private drawEntities() {
@@ -351,7 +346,7 @@ export class WorldView extends State {
                 coin.getH()
             )));
 
-        this.heartGroup.getSprites().forEach((heart: GameItem) => (
+        this.heartGroup.getSprites().forEach((heart: Heart) => (
             this.bufferCtx.drawImage(
                 this.tilesetMap,
                 this.spriteData[heart.type].x,
