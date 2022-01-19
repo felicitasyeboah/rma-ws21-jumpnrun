@@ -289,8 +289,13 @@ export class WorldView extends State {
         //     this.player.getW(),// * this.player.playerData.frames[0].rect[2] /this.player.playerData.frames[0].rect[3],
         //     this.player.getH());
 
-        this.bufferCtx.drawImage(this.player.getPlayerSprites(), 72 * this.player.currentFrame, 97 * this.player.getTileY(), 72, 97, this.player.getX(), this.player.getY(),
-            this.player.getW(), this.player.getH());
+        this.bufferCtx.drawImage(this.player.getPlayerSprites(),
+            72 * this.player.currentFrame,
+            97 * this.player.getTileY(),
+            72, 97, this.player.getX(),
+            this.player.getY(),
+            this.player.getW(),
+            this.player.getH());
     }
 
     private drawEntities() {
@@ -308,9 +313,9 @@ export class WorldView extends State {
             )
         });
         this.enemyGroup.getSprites().forEach((enemy: Enemy) => (
-            this.bufferCtx.drawImage(
+        this.bufferCtx.drawImage(
                 this.tilesetMap,
-                this.spriteData[enemy.type].x,
+                this.spriteData[enemy.type].x + (this.spriteData[enemy.type].w * enemy.currentFrame),
                 this.spriteData[enemy.type].y,
                 this.spriteData[enemy.type].w,
                 this.spriteData[enemy.type].h,
@@ -336,7 +341,7 @@ export class WorldView extends State {
         this.coinGroup.getSprites().forEach((coin: Coin) => (
             this.bufferCtx.drawImage(
                 this.tilesetMap,
-                this.spriteData[coin.type].x,
+                this.spriteData[coin.type].x + (this.spriteData[coin.type].w * coin.currentFrame),
                 this.spriteData[coin.type].y,
                 this.spriteData[coin.type].w,
                 this.spriteData[coin.type].h,

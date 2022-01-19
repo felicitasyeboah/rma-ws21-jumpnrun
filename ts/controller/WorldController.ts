@@ -92,17 +92,17 @@ export class WorldController extends StateController {
         if (event.type == "click" && event.target.className == "btn btn-resume" && this.gameModel.keyState.pause) {
             this.resumeState();
         }
-        // Restart-Fenster: wenn auf den Restart-Button geclickt wird -> restart Level
+        // Restart-Level-Fenster: wenn auf den Restart-Button geclickt wird -> restart Level
         if ((event.target.className == "btn btn-restart-level" && GameModel.KEY.ENTER.includes((event.key))) ||
             (event.type == "click" && event.target.className == "btn btn-restart-level")) {
             this.restartLevel();
         }
-        // Game Over-Fenster: wenn auf den Quit-Button geclickt wird -> Quit Game (zurueck zum Hauptmenue)
+        // Restart-Level und Game Over-Fenster: wenn auf den Quit-Button geclickt wird -> Quit Game (zurueck zum Hauptmenue)
         if ((event.target.className == "btn btn-quit" && GameModel.KEY.ENTER.includes((event.key))) ||
             (event.type == "click" && event.target.className == "btn btn-quit")) {
             this.quitGame();
         }
-        // Restart-Fenster: wenn auf den Restart-Button geclickt wird -> restart Level
+        // Game Over Fenster: wenn auf den Restart-Game-Button geclickt wird -> restart game
         if ((event.target.className == "btn btn-restart-game" && GameModel.KEY.ENTER.includes((event.key))) ||
             (event.type == "click" && event.target.className == "btn btn-restart-game")) {
             this.restartGame();
@@ -135,6 +135,7 @@ export class WorldController extends StateController {
                 this.player.update();
                 this.enemyGroup.update();
                 this.platformGroup.update();
+                this.coinGroup.update();
                 this.handleCollisionObject(this.player);
             }
         }
@@ -227,6 +228,11 @@ export class WorldController extends StateController {
     private restartGame() {
         this.view.next = 'world';
         this.view.done = true;
+        CANVAS_DATA.DIV_RESTART.style.display = "none";
+        CANVAS_DATA.DIV_GAME_OVER.style.display = "none";
+        CANVAS_DATA.DIV_NEW_HIGHSCORE.style.display = "none";
+        this.player.reset();
+
     }
 
     // setzt den Spieler wieder am Anfang des Levels beginnen, nachdem er gestorben ist und noch Leben uebrig hat

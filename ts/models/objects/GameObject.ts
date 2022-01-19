@@ -179,6 +179,8 @@ export class Water extends GameItem {
 }
 
 export class Coin extends GameItem {
+    delay = 205;
+    time = Date.now();
     constructor(gameModel: GameModel, x: number, y: number) {
         super(gameModel, x, y);
 
@@ -186,10 +188,24 @@ export class Coin extends GameItem {
         this.h = this.spriteData.coin.h * 0.7;
         this._type = this.spriteData.coin.type;
         this.frames = this.spriteData.coin.frames;
+        this.currentFrame = 0;
 
     }
-
+    update () {
+        if(Date.now() - this.time >= this.delay){
+            this.currentFrame++;
+            if(this.currentFrame >= this.frames) {
+                this.currentFrame = 0;
+            }
+            if ((Date.now() - this.time - this.delay) > this.delay){
+                this.time = Date.now();
+            } else {
+                this.time += this.delay;
+            }
+        }
+    }
     _type: string;
+    currentFrame: number;
 }
 
 export class Heart extends GameItem {
@@ -233,15 +249,17 @@ abstract class MovingItem extends GameItem {
  * Gegnerobjekt, das sich bewegt.
  */
 export class Enemy extends MovingItem {
+
     constructor(gameModel: GameModel, x: number, y: number, type: string) {
         super(gameModel, x, y);
         this.w = CANVAS_DATA.TILE_SIZE;
         this.h = CANVAS_DATA.TILE_SIZE / this.spriteData.slime.w * this.spriteData.slime.h
         this._type = type;
+        this.frames = this.spriteData.slime.frames;
+        this.currentFrame = 0;
     }
 
-
-    //kann auch Updatefunktion werden
+    // Updatefunktion
     update() {
         this.x += this.moveDirection;
         this.moveCounter++;
@@ -249,9 +267,23 @@ export class Enemy extends MovingItem {
             this.moveDirection *= -1;
             this.moveCounter *= -1;
         }
-    }
 
+        if(Date.now() - this.time >= this.delay){
+            this.currentFrame++;
+            if(this.currentFrame >= this.frames) {
+                this.currentFrame = 0;
+            }
+            if ((Date.now() - this.time - this.delay) > this.delay){
+                this.time = Date.now();
+            } else {
+                this.time += this.delay;
+            }
+        }
+    }
+    delay = 150;
+    time = Date.now();
     _type: string;
+    currentFrame: number;
 }
 
 /**

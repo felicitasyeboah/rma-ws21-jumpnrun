@@ -78,8 +78,8 @@ export class Player extends GameObject {
     // settz Werte, die beim sterben gesetzt wurden, wieder auf default-werte zurueck und setzt den Spieler zum Startpunkt zureuck
     reborn() {
         this.resetPlayerPos();
-        this._gravity = 2.5;
-        this._friction = 0.6;
+        this._gravity = 2;
+        this._friction = 0.4;
         this.alive = true;
     }
 
@@ -94,12 +94,10 @@ export class Player extends GameObject {
             this.xVelocity -= 1;
             if (this.currentFrame >= this.frames) this.currentFrame = 0;
             else this.currentFrame++;
-
-
         }
         if (this.keyState.right) {
             this.xVelocity = 4;
-            this.tileY = 0
+            this.tileY = 0;
             if (this.currentFrame >= this.frames) this.currentFrame = 0;
             else this.currentFrame++;
         }
