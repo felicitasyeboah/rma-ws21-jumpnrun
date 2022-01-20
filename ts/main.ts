@@ -8,7 +8,7 @@ import {Event} from "createjs-module";
 import {WorldController} from "./controller/WorldController.js";
 import {StartMenuController} from "./controller/StartMenuController.js";
 import {HighscoreController} from "./controller/HighscoreController.js";
-import {CANVAS_DATA} from "./game_config.js";
+import {CANVAS_DATA} from "./canvas_config.js";
 import {InstructionController} from "./controller/InstructionController.js";
 
 
@@ -27,12 +27,8 @@ function loadEntities() {
     preload.loadManifest(([
         // Tilemapdaten Laden aus CSV-Dateien
         {id: "level1", src: "map_data/level01.csv", group: "tileMapLevelData"},
-        {id: "level2", src: "map_data/tilemap_level2.csv", group: "tileMapLevelData"},
-        {id: "level3", src: "map_data/tilemap_level3.csv", group: "tileMapLevelData"},
-        {id: "level4", src: "map_data/tilemap_level4.csv", group: "tileMapLevelData"},
-        {id: "level5", src: "map_data/tilemap_level5.csv", group: "tileMapLevelData"},
-        {id: "level6", src: "map_data/tilemap_level6.csv", group: "tileMapLevelData"},
-        {id: "level7", src: "map_data/tilemap_level7.csv", group: "tileMapLevelData"},
+        {id: "level2", src: "map_data/level02.csv", group: "tileMapLevelData"},
+        {id: "level3", src: "map_data/level03.csv", group: "tileMapLevelData"},
 
         // Load CollisionmapData aus JSON File
         {id: "collisionMapData", src: "map_data/collisionMapData.json", group: "tileMapLevelData"},
