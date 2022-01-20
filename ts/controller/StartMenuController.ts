@@ -103,6 +103,7 @@ export class StartMenuController extends StateController {
                 break;
             case 'instruction':
                 this.view.next = btn.name;
+                this.view.done = true;
                 break;
         }
     }
@@ -127,8 +128,8 @@ export class StartMenuController extends StateController {
         });
         btn.alpha = 1;
         btn.bodyColor = '#FEA443';
-        btn.fontColor = '#3b899f';
-        btn.borderColor = '#3b899f';
+        btn.fontColor = '#1f4854';
+        btn.borderColor = '#1f4854';
         this.view.activeButton = btn;
     }
 

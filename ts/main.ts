@@ -9,6 +9,7 @@ import {WorldController} from "./controller/WorldController.js";
 import {StartMenuController} from "./controller/StartMenuController.js";
 import {HighscoreController} from "./controller/HighscoreController.js";
 import {CANVAS_DATA} from "./game_config.js";
+import {InstructionController} from "./controller/InstructionController.js";
 
 
 let collisionMapData = {};
@@ -25,7 +26,7 @@ function loadEntities() {
     preload.addEventListener("complete", startGame);
     preload.loadManifest(([
         // Tilemapdaten Laden aus CSV-Dateien
-        {id: "level1", src: "map_data/tilemap_level1.csv", group: "tileMapLevelData"},
+        {id: "level1", src: "map_data/level01.csv", group: "tileMapLevelData"},
         {id: "level2", src: "map_data/tilemap_level2.csv", group: "tileMapLevelData"},
         {id: "level3", src: "map_data/tilemap_level3.csv", group: "tileMapLevelData"},
         {id: "level4", src: "map_data/tilemap_level4.csv", group: "tileMapLevelData"},
@@ -45,10 +46,11 @@ function loadEntities() {
         {id: "tilesetPlayer", src: "img/player_sprite.png"},
 
         // Tilemap Spritesheet
-        {id: "tilesetMap", src: "img/tileset_64x512_n.png"},
+        {id: "tilesetMap", src: "img/tileset_ice.png"},
 
         // Background Game
         {id: "background", src: "img/background.png"},
+        {id: "backgroundInstruction", src: "img/background_instruction.png"},
 
 
         //TODO: // Sounds laden
@@ -111,11 +113,11 @@ function startGame() {
         'world': new WorldController(gameModel, STATE_DATA.world),
         'startMenu': new StartMenuController(gameModel, STATE_DATA.startMenu),
         'highscore': new HighscoreController(gameModel, STATE_DATA.highscore),
-        'instruction': new WorldController(gameModel, STATE_DATA.world)
+        'instruction': new InstructionController(gameModel, STATE_DATA.instruction)
     }
 
     /* View wird anhand des aktuellen States initialisiert in der GameController Klasse */
-    const gameController = new GameController(gameModel, STATE_DATA, 'world', CONTROLLER_DATA);
+    const gameController = new GameController(gameModel, STATE_DATA, 'startMenu', CONTROLLER_DATA);
 
     // GameController startet die Hauptspielschleife
     gameController.mainGameLoop(0);

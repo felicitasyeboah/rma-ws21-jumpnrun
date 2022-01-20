@@ -34,6 +34,8 @@ export class GameModel {
     spriteData: {};
     playerData: {};
     private _backgroundImage: ImageBitmap;
+    private _backgroundImageInstruction: ImageBitmap;
+
 
     constructor(public tileMapLevelData: {}, public worldImages: { [key: string]: string },
                 public collisionMapData: { [key: string]: number[] }, spriteData: {}, playerData: any) {
@@ -61,14 +63,7 @@ export class GameModel {
         this.heartGroup = new SpriteGroup();
         this.spriteData = spriteData;
         this._backgroundImage = worldImages['background'] as unknown as ImageBitmap;
-    }
-
-    getHighscore() {
-        console.log("Das ist dein Highscore.");
-    }
-
-    setHighscore(name: string, punkte: number) {
-        console.log("Name: " + name, "Punkte: " + punkte);
+        this._backgroundImageInstruction = worldImages['backgroundInstruction'] as unknown as ImageBitmap;
     }
 
     getDeltatime() {
@@ -158,6 +153,10 @@ export class GameModel {
         this.player = value;
     }
 
+
+    get backgroundImageInstruction(): ImageBitmap {
+        return this._backgroundImageInstruction;
+    }
 
     get backgroundImage(): ImageBitmap {
         return this._backgroundImage;
