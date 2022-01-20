@@ -2,19 +2,6 @@ import {GameModel} from "../GameModel.js";
 import {CANVAS_DATA} from "../../game_config.js";
 
 export class GameObject {
-    protected xOld: number;
-    protected yOld: number;
-    protected x: number;
-    protected y: number;
-    protected w: number;
-    protected h: number;
-    protected gameModel: GameModel;
-    protected inTheAir: boolean;
-    protected xVelocity: number;
-    protected yVelocity: number;
-    frames: number;
-    spriteData: any;
-
     constructor(gameModel: GameModel, x: number, y: number) {
         this.gameModel = gameModel;
         this.spriteData = gameModel.spriteData;
@@ -33,6 +20,7 @@ export class GameObject {
     update() {
         // to be overriden
     }
+
     // Getters and Setters
     getLeft() {
         return this.x;
@@ -118,6 +106,7 @@ export class GameObject {
     getOldX() {
         return this.xOld;
     }
+
     getOldY() {
         return this.yOld;
     }
@@ -153,10 +142,24 @@ export class GameObject {
     setXVelocity(number: number) {
         this.xVelocity = number;
     }
+
+    protected xOld: number;
+    protected yOld: number;
+    protected x: number;
+    protected y: number;
+    protected w: number;
+    protected h: number;
+    protected gameModel: GameModel;
+    protected inTheAir: boolean;
+    protected xVelocity: number;
+    protected yVelocity: number;
+    frames: number;
+    spriteData: any;
 }
 
 abstract class GameItem extends GameObject {
     abstract _type: string;
+
     protected constructor(gameModel: GameModel, x: number, y: number) {
         super(gameModel, x, y,)
         this.gameModel = gameModel;
@@ -181,6 +184,7 @@ export class Water extends GameItem {
 export class Coin extends GameItem {
     delay = 205;
     time = Date.now();
+
     constructor(gameModel: GameModel, x: number, y: number) {
         super(gameModel, x, y);
 
@@ -191,19 +195,22 @@ export class Coin extends GameItem {
         this.currentFrame = 0;
 
     }
-    update () {
-        if(Date.now() - this.time >= this.delay){
+
+    update() {
+        const delta = Date.now() - this.time;
+        if (delta >= this.delay) {
             this.currentFrame++;
-            if(this.currentFrame >= this.frames) {
+            if (this.currentFrame >= this.frames) {
                 this.currentFrame = 0;
             }
-            if ((Date.now() - this.time - this.delay) > this.delay){
+            if ((delta - this.delay) > this.delay) {
                 this.time = Date.now();
             } else {
                 this.time += this.delay;
             }
         }
     }
+
     _type: string;
     currentFrame: number;
 }
@@ -215,6 +222,7 @@ export class Heart extends GameItem {
         this.h = this.spriteData.heart_full.h / 1.5;
         this._type = type;
     }
+
     _type: string;
 }
 
@@ -225,6 +233,7 @@ export class Door extends GameItem {
         this.h = CANVAS_DATA.TILE_SIZE / this.spriteData.door.w * this.spriteData.door.h;
         this._type = this.spriteData.door.type;
     }
+
     _type: string;
 }
 
@@ -232,23 +241,24 @@ export class Door extends GameItem {
  * Oberklasse für bewegende Items der Karte
  */
 abstract class MovingItem extends GameItem {
-    moveDirection: number;
-    moveCounter: number
-
     protected constructor(gameModel: GameModel, x: number, y: number) {
         super(gameModel, x, y);
         this.moveDirection = 1; // 1 = nach rechts, -1 = nach links
         this.moveCounter = 0;
-        this._type ="";
+        this._type = "";
     }
 
     _type: string;
+    moveDirection: number;
+    moveCounter: number;
 }
 
 /**
  * Gegnerobjekt, das sich bewegt.
  */
 export class Enemy extends MovingItem {
+    delay = 150;
+    time = Date.now();
 
     constructor(gameModel: GameModel, x: number, y: number, type: string) {
         super(gameModel, x, y);
@@ -267,21 +277,20 @@ export class Enemy extends MovingItem {
             this.moveDirection *= -1;
             this.moveCounter *= -1;
         }
-
-        if(Date.now() - this.time >= this.delay){
+        const delta = Date.now() - this.time;
+        if (delta >= this.delay) {
             this.currentFrame++;
-            if(this.currentFrame >= this.frames) {
+            if (this.currentFrame >= this.frames) {
                 this.currentFrame = 0;
             }
-            if ((Date.now() - this.time - this.delay) > this.delay){
+            if ((delta - this.delay) > this.delay) {
                 this.time = Date.now();
             } else {
                 this.time += this.delay;
             }
         }
     }
-    delay = 150;
-    time = Date.now();
+
     _type: string;
     currentFrame: number;
 }
@@ -290,13 +299,31 @@ export class Enemy extends MovingItem {
  * Bewegliche Platform
  */
 export class MovingPlatform extends MovingItem {
-    _type: string;
     private _moveX: number; // 1 = gesetzt (bewegt sich), 0 = ungesetzt(bewegt sich nicht)
     private _moveY: number; // 1 = gesetzt (bewegt sich), 0 = ungesetzt(bewegt sich nicht)
+    baseX: number;
+    baseY: number;
     constructor(gameModel: GameModel, x: number, y: number, moveX: number, moveY: number, type: string) {
         super(gameModel, x, y);
         this._moveX = moveX;
         this._moveY = moveY;
+        this.baseX = x;
+        this.baseY = y;
+        if(type == "movingPlatformX") {
+            this.x = this.baseX + Math.floor(Math.random() * (2 * CANVAS_DATA.TILE_SIZE)) - CANVAS_DATA.TILE_SIZE;
+            let dif = this.baseX - this.x;
+            this.moveCounter += -dif;
+        }
+        if(type == "movingPlatformY") {
+            this.y = this.baseY + Math.floor(Math.random() * (2 * CANVAS_DATA.TILE_SIZE)) - CANVAS_DATA.TILE_SIZE;
+            let dif = this.baseY - this.y;
+            this.moveCounter += -dif;
+        }
+        let myArray = [1,-1];
+        let rand = Math.floor(Math.random()*myArray.length);
+        let rValue = myArray[rand];
+        this.moveDirection = rValue;
+        console.log(rValue)
         this.w = CANVAS_DATA.TILE_SIZE;
         this.h = CANVAS_DATA.TILE_SIZE / this.spriteData.movingPlatformX.w * this.spriteData.movingPlatformX.h;
         this._type = type;
@@ -313,7 +340,6 @@ export class MovingPlatform extends MovingItem {
         }
     }
 
-
     get moveX(): number {
         return this._moveX;
     }
@@ -321,5 +347,7 @@ export class MovingPlatform extends MovingItem {
     get moveY(): number {
         return this._moveY;
     }
+
+    _type: string;
 }
 
