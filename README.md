@@ -4,7 +4,13 @@
 
 ### Datum der Abgabe:   20. Januar 2022
 
-##### Kurze Beschreibung: Ziel ist es alle drei Level zu beenden und dabei möglichst viele Muenzen zu sammeln.
+### 1. run 'npm install'
+
+### 2. run 'tsc' to compile
+
+##### Kurze Beschreibung:
+
+##### Ziel ist es alle drei Level zu beenden und dabei möglichst viele Muenzen zu sammeln.
 
 ##### Jedes Level hat einen Timer. Wenn dieser abgelaufen ist, ist das Spiel beendet. Erreicht der Spieler vor Ablauf des Timers das naechste Level, wird der Timer zurueckgesetzt.
 

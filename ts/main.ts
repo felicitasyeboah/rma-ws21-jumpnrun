@@ -48,9 +48,11 @@ function loadEntities() {
         {id: "background", src: "img/background.png"},
         {id: "backgroundInstruction", src: "img/background_instruction.png"},
 
-
-        //TODO: // Sounds laden
-
+        // Sounds laden
+        // {id: "fx_coin", src: "fx/coin.wav"},
+        // {id: "fx_game_over", src: "fx/game_over.wav"},
+        // {id: "fx_jump", src: "fx/jump.wav"},
+        // {id: "fx_bg_music", src: "fx/music.wav"},
     ]));
 }
 
@@ -71,7 +73,6 @@ function handleFileload(event: Event) {
     }
     if (event.item.type === "image") {
         worldImages[event.item.id] = event.result;
-        console.log(worldImages);
     }
     if (event.item.type === "json") {
         if (event.item.id == "collisionMapData") {
@@ -82,10 +83,8 @@ function handleFileload(event: Event) {
         }
         if (event.item.id == "playerData") {
             playerData = event.result;
-            console.log("playerdata", playerData);
         }
     }
-
 }
 
 /**
