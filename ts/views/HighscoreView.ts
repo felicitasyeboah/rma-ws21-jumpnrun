@@ -14,7 +14,7 @@ export default class HighscoreView extends State {
     private _btnBackToMenu!: Button;
 
     constructor(private gameModel: GameModel) {
-        super(CANVAS_DATA);
+        super();
         this._next = "startMenu";
         this.buttonWidth = 8;
         this.buttonHeight = 1.5;
@@ -101,13 +101,13 @@ export default class HighscoreView extends State {
 
     // leert die view
     cleanup(): void {
-        this.CANVAS_DATA.BUFFER_CTX.clearRect(0,0, CANVAS_DATA.BUFFER_CANVAS.width, CANVAS_DATA.BUFFER_CANVAS.height);
+        CANVAS_DATA.BUFFER_CTX.clearRect(0,0, CANVAS_DATA.BUFFER_CANVAS.width, CANVAS_DATA.BUFFER_CANVAS.height);
         this._buttonGroup.clear();
     }
 
     // updated den das Zeichnen auf dem Canvas
     update(): void {
-        this.CANVAS_DATA.BUFFER_CTX.clearRect(0,0, CANVAS_DATA.BUFFER_CANVAS.width, CANVAS_DATA.BUFFER_CANVAS.height);
+        CANVAS_DATA.BUFFER_CTX.clearRect(0,0, CANVAS_DATA.BUFFER_CANVAS.width, CANVAS_DATA.BUFFER_CANVAS.height);
         this._drawBackground();
         this._drawButton();
     }

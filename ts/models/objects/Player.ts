@@ -56,7 +56,7 @@ export class Player extends GameObject {
         this.lifeCounter = 3;
         this.coinCounter = 0;
 
-        this.jumpHeight = -17;
+        this.jumpHeight = -20;
 
         this.frames = 10;
         this.currentFrame = 0;
@@ -91,7 +91,6 @@ export class Player extends GameObject {
         if (this.keyState.left) {
             this.xVelocity = -4;
             this.tileY = 1;
-            this.xVelocity -= 1;
             if (this.currentFrame >= this.frames) this.currentFrame = 0;
             else this.currentFrame++;
         }
@@ -158,13 +157,13 @@ export class Player extends GameObject {
             this.xVelocity *= this._friction;
         }
 
-        if ((!this.alive)) {
-            if (this.y <= 96) {
-                this.yVelocity = 0;
-                this.y = 96;
-                this.xVelocity = 0;
-            }
-        }
+        // if ((!this.alive)) {
+        //     if (this.y <= 96) {
+        //         this.yVelocity = 0;
+        //         this.y = 96;
+        //         this.xVelocity = 0;
+        //     }
+        // }
 
         this.inTheAir = true;
         this.move();
@@ -172,6 +171,8 @@ export class Player extends GameObject {
         this.yOld = this.y;
         this.x += this.xVelocity;
         this.y += this.yVelocity;
+
+
     }
 
     // Getter and Setters \\

@@ -63,7 +63,7 @@ export default class GameController {
             // wenn in der Wordlview auf Pause gedrueckt wird, werden die update der Views und Controller ausgesetzt,
             // Es wird nur das letzte Standbild aus dem Buffercanvas neugerendert. Dadurch wird auf dem Canvas auch beim
             // Resizen des Browsers etwas dargestellt
-            if (this.stateName === "world" && this.gameModel.keyState.pause) {
+            if ((this.stateName === "world" && this.gameModel.keyState.pause) || (this.state.freeze)) {
                 this.renderDisplay();
                 return;
             }
@@ -79,6 +79,8 @@ export default class GameController {
 
     // skaliert den Buffercanvas auf den tatsechlichen Canvas (DISPLAY_CANVAS)
     private renderDisplay() {
+        CANVAS_DATA.DISPLAY_CTX.imageSmoothingEnabled = false;
+        CANVAS_DATA.DISPLAY_CTX.clearRect(0,0,CANVAS_DATA.DISPLAY_CANVAS.width, CANVAS_DATA.DISPLAY_CANVAS.height);
         CANVAS_DATA.DISPLAY_CTX.drawImage(
             CANVAS_DATA.BUFFER_CANVAS,
             0,
