@@ -25,10 +25,11 @@ export class WorldView extends State {
     private _timeToFinishLevel: number;
     levelTimer: number;
     protected _next: string;
+    freeze: boolean;
 
 
     constructor(private gameModel: GameModel) {
-        super(CANVAS_DATA);
+        super();
         this._next = "startMenu";
         this.hudCtx = CANVAS_DATA.HUD_CTX;
         this.tileMapLevelData = gameModel.tileMapLevelData;
@@ -45,6 +46,7 @@ export class WorldView extends State {
         this.waterGroup = gameModel.getWaterGroup();
         this.heartGroup = gameModel.getHeartGroup();
         this.levelTimer = 0;
+        this.freeze = false;
     }
 
     /**
@@ -58,6 +60,8 @@ export class WorldView extends State {
     }
 
     cleanup() {
+        this.freeze = false;
+        console.log(this.freeze);
         this.stopLevelTimer(this.levelTimer);
         this.levelMap = [];
         this._tileList = [];
@@ -134,9 +138,8 @@ export class WorldView extends State {
                         this.spriteData.slime.type)
                     this.enemyGroup.add(slime);
                 }
-                // Platform mit streuseln
+                // Platform Bewegung in X-Richtung (mit streuseln)
                 if (tile == 3) {
-
                     let platform = new MovingPlatform(this.gameModel,
                         col * this.tileSize,
                         row * this.tileSize,
@@ -181,13 +184,97 @@ export class WorldView extends State {
                         col * this.tileSize,
                         row * this.tileSize);
                     this._tileList.push(
-                        door);/*{
-                        type: "exit",
-                        dx: col * this.tileSize,
-                        dy: row * this.tileSize,
-                        dw: this.tileSize,
-                        dh: this.tileSize / this.spriteData["exit"].w * this.spriteData["exit"].h,
-                    });*/
+                        door);
+                }
+                // TILE 8 = Igloo_Left
+                if (tile == 8) {
+                    this._tileList.push({
+                        type: "igloo_left",
+                        x: col * this.tileSize,
+                        y: row * this.tileSize,
+                        w: this.tileSize,
+                        h: this.tileSize,
+                    });
+                }
+                // TILE 9 = igloo_top
+                if (tile == 9) {
+                    this._tileList.push({
+                        type: "igloo_top",
+                        x: col * this.tileSize,
+                        y: row * this.tileSize,
+                        w: this.tileSize,
+                        h: this.tileSize,
+                    });
+                }
+                // TILE 10 = igloo_right
+                if (tile == 10) {
+                    this._tileList.push({
+                        type: "igloo_right",
+                        x: col * this.tileSize,
+                        y: row * this.tileSize,
+                        w: this.tileSize,
+                        h: this.tileSize,
+                    });
+                }
+                // TILE 11 = igloo
+                if (tile == 11) {
+                    this._tileList.push({
+                        type: "igloo",
+                        x: col * this.tileSize,
+                        y: row * this.tileSize,
+                        w: this.tileSize,
+                        h: this.tileSize,
+                    });
+                }
+                // TILE 12 = spike1
+                if (tile == 12) {
+                    this._tileList.push({
+                        type: "spike1",
+                        x: col * this.tileSize,
+                        y: row * this.tileSize,
+                        w: this.tileSize,
+                        h: this.tileSize,
+                    });
+                }
+                // TILE 13 = icetree
+                if (tile == 13) {
+                    this._tileList.push({
+                        type: "icetree",
+                        x: col * this.tileSize,
+                        y: row * this.tileSize,
+                        w: this.tileSize,
+                        h: this.tileSize,
+                    });
+                }
+                // TILE 14 = spike2
+                if (tile == 14) {
+                    this._tileList.push({
+                        type: "spike2",
+                        x: col * this.tileSize,
+                        y: row * this.tileSize,
+                        w: this.tileSize,
+                        h: this.tileSize,
+                    });
+                }
+                // TILE 15 = spike3
+                if (tile == 15) {
+                    this._tileList.push({
+                        type: "spike3",
+                        x: col * this.tileSize,
+                        y: row * this.tileSize,
+                        w: this.tileSize,
+                        h: this.tileSize,
+                    });
+                }
+                // TILE 16 = spike4
+                if (tile == 16) {
+                    this._tileList.push({
+                        type: "spike4",
+                        x: col * this.tileSize,
+                        y: row * this.tileSize,
+                        w: this.tileSize,
+                        h: this.tileSize,
+                    });
                 }
             }
         }
@@ -200,34 +287,34 @@ export class WorldView extends State {
         // HUD Coin Count
         let hudCoin = new Coin(this.gameModel,
             this.tileSize * 12.5,
-            43);
+            14);
         this.coinGroup.add(hudCoin);
 
         // HUD Life count
         let hudHeartFull1L = new Heart(this.gameModel,
             this.tileSize * 3.5,
-            42,
+            12,
             "heart_full");
 
         let hudHeartFull2L = new Heart(this.gameModel,
             hudHeartFull1L.getX() + hudHeartFull1L.getW() + spacing,
-            42,
+            12,
             "heart_full");
         let hudHeartFull3L = new Heart(this.gameModel,
             hudHeartFull2L.getX() + hudHeartFull2L.getW() + spacing,
-            42,
+            12,
             "heart_full");
         let hudHeart1L = new Heart(this.gameModel,
             this.tileSize * 3.5,
-            42,
+            12,
             "heart_empty");
         let hudHeart2L = new Heart(this.gameModel,
             hudHeart1L.getX() + hudHeart1L.getW() + spacing,
-            42,
+            12,
             "heart_empty");
         let hudHeart3L = new Heart(this.gameModel,
             hudHeart2L.getX() + hudHeart2L.getW() + spacing,
-            42,
+            12,
             "heart_empty");
 
         this.heartGroup.add(hudHeart1L);
@@ -245,7 +332,7 @@ export class WorldView extends State {
     }
 
     private drawBackground() {
-        this.bufferCtx.drawImage(this.bgImage, 0, 0, this.CANVAS_DATA.GAME_WIDTH, this.CANVAS_DATA.GAME_HEIGHT);
+        this.bufferCtx.drawImage(this.bgImage, 0, 0, CANVAS_DATA.GAME_WIDTH, CANVAS_DATA.GAME_HEIGHT);
     }
 
     /**
@@ -265,11 +352,6 @@ export class WorldView extends State {
                 tile.w,
                 tile.h,
             );
-
-            //this.bufferCtx.strokeStyle = "darkgrey";
-            //this.bufferCtx.lineWidth = 0.5;
-            //this.bufferCtx.strokeRect(col * this.tileSize, row * this.tileSize, this.tileSize - this.bufferCtx.lineWidth, this.tileSize - this.bufferCtx.lineWidth);
-
         }
     }
 
@@ -371,16 +453,16 @@ export class WorldView extends State {
         this.hudCtx.fillText(
             "x" + this.player.getCoinCounter(),
             this.tileSize * 13,
-            55);
+            26);
         this.hudCtx.fillText(
             "LIVES", this.tileSize * 1.5,
-            55);
+            26);
         this.hudCtx.fillText(
             "LEVEL " + this.gameModel.getCurrentLevel() + "/" + this.gameModel.getMaxLevel(),
             this.tileSize * 7,
-            55);
+            26);
 
-        this.hudCtx.fillText("TIME " + this._timeToFinishLevel.toString(), this.tileSize * 15.5, 55)
+        this.hudCtx.fillText("TIME " + this._timeToFinishLevel.toString(), this.tileSize * 15.5, 26)
         this.bufferCtx.drawImage(CANVAS_DATA.HUD_CANVAS, 0, 0);
     }
 
@@ -388,14 +470,14 @@ export class WorldView extends State {
      * Redraws the View
      */
     update() {
+        this.bufferCtx.imageSmoothingEnabled = false;
         this.hudCtx.clearRect(0, 0, this.gameWidth, this.hudCtx.canvas.height);
         this.bufferCtx.clearRect(0, 0, this.gameWidth, this.gameHeight);
-        this.displayCtx.clearRect(0, 0, this.displayCanvas.width, this.displayCanvas.height);
         this.drawBackground();
-        this.drawMap();
         this.drawEntities();
-        this.drawHud();
         this.drawPlayer();
+        this.drawMap();
+        this.drawHud();
     }
 
 // Getter & Setter

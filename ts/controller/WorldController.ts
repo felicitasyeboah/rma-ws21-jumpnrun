@@ -129,7 +129,6 @@ export class WorldController extends StateController {
 
     // Updated die Daten für die View
     update() {
-
         if (this.player.getAlive()) {
             {
                 this.player.update();
@@ -142,6 +141,14 @@ export class WorldController extends StateController {
         // wenn der spieler ein leben verloren hat, nur playerupdaten, alles andere ist angehalten
         else {
             this.player.update();
+            if (this.player.getY() <= 96) {
+                this.player.setYVelocity(0);
+                this.player.setY(96);
+                this.player.setXVelocity(0);
+            }
+            if(this.player.getY() <= 96) {
+                this.view.freeze = true;
+            }
 
             // wenn Spieler keine Leben mehr hat
             if (this.player.getLifeCounter() == 0) {
@@ -224,8 +231,9 @@ export class WorldController extends StateController {
         CANVAS_DATA.DIV_PAUSE.style.display = "flex";
         this.view.stopLevelTimer(this.view.levelTimer);
     }
-
+    // startet das Spiel ganz von vorne
     private restartGame() {
+        this.view.freeze = false;
         this.view.next = 'world';
         this.view.done = true;
         CANVAS_DATA.DIV_RESTART.style.display = "none";
@@ -238,13 +246,16 @@ export class WorldController extends StateController {
     // setzt den Spieler wieder am Anfang des Levels beginnen, nachdem er gestorben ist und noch Leben uebrig hat
     private restartLevel() {
         CANVAS_DATA.DIV_RESTART.style.display = "none";
+        this.view.freeze = false;
         this.player.reborn();
         this.view.setLevelTimer();
     }
 
     // zurueck zum StartMenu -> setzt alle Daten zurueck
     private quitGame() {
+        this.view.next = "startMenu";
         this.view.done = true;
+        this.view.freeze = false;
         CANVAS_DATA.DIV_RESTART.style.display = "none";
         CANVAS_DATA.DIV_GAME_OVER.style.display = "none";
         CANVAS_DATA.DIV_NEW_HIGHSCORE.style.display = "none";
@@ -305,17 +316,19 @@ export class WorldController extends StateController {
             ytop: number,
             ybottom: number
         }) => {
-            // CANVAS_DATA.BUFFER_CTX.strokeStyle = "blue";
-            // CANVAS_DATA.BUFFER_CTX.beginPath();
-            // CANVAS_DATA.BUFFER_CTX.rect(
-            //     Math.floor(tile.xleft / CANVAS_DATA.TILE_SIZE) * CANVAS_DATA.TILE_SIZE,
-            //     Math.floor(tile.ytop / CANVAS_DATA.TILE_SIZE) * CANVAS_DATA.TILE_SIZE,
-            //     CANVAS_DATA.TILE_SIZE, CANVAS_DATA.TILE_SIZE);
-            // CANVAS_DATA.BUFFER_CTX.stroke();
+            // nur zum Debuggen
+            CANVAS_DATA.BUFFER_CTX.strokeStyle = "blue";
+            CANVAS_DATA.BUFFER_CTX.lineWidth = 1;
+            CANVAS_DATA.BUFFER_CTX.beginPath();
+            CANVAS_DATA.BUFFER_CTX.rect(
+                Math.floor(tile.xleft / CANVAS_DATA.TILE_SIZE) * CANVAS_DATA.TILE_SIZE,
+                Math.floor(tile.ytop / CANVAS_DATA.TILE_SIZE) * CANVAS_DATA.TILE_SIZE,
+                CANVAS_DATA.TILE_SIZE, CANVAS_DATA.TILE_SIZE);
+            CANVAS_DATA.BUFFER_CTX.stroke();
 
             // 11 = c_left, 12 = c_top, 13 = c_right, 14 = c_bottom,
-            // 21 = c_top_left, 22 = c_top_right, 23 = c_top_left_right
-            // 31 = c_bottom_left, 32 = c_bottom_right, 33 = c_bottom_left_right
+            // 21 = c_top_left, 22 = c_top_right, 23 = c_bottom_right, 24 = c_bottom_left,
+            // 31 = c_bottom_left_right, 32 = c_top_left_right, 33 = c_right_top_bottom, 34 = c_left_top_bottom
             // 41 = c_top_left_right_bottom,
             // 51 = c_exit, 52 = c_water, 53 = c_coin, 54 = c_enemy
             // 99 = none,
@@ -349,24 +362,36 @@ export class WorldController extends StateController {
                     if (this.collidePlatformRight(object, rightTileX)) return;
                     this.collidePlatformTop(object, topTileY);
                     break;
-                case 23: //23 = top_left_right
+                case 23: // 23 = c_bottom_right
+                    if (this.collidePlatformRight(object, rightTileX)) return;
+                    this.collidePlatformBottom(object, bottomTileY);
+                    break;
+                case 24: // 24 = c_bottom_left
+                    if (this.collidePlatformLeft(object, leftTileX)) return;
+                    this.collidePlatformBottom(object, bottomTileY)
+                    break;
+
+                case 31: // 33 = c_bottom_left_right
+                    if (this.collidePlatformRight(object, rightTileX)) return;
+                    if (this.collidePlatformLeft(object, leftTileX)) return;
+                    this.collidePlatformBottom(object, bottomTileY)
+                    break;
+                case 32: //32 = top_left_right
                     if (this.collidePlatformRight(object, rightTileX)) return;
                     if (this.collidePlatformLeft(object, leftTileX)) return;
                     this.collidePlatformTop(object, topTileY)
                     break;
-                case 31: // 31 = c_bottom_left
-                    if (this.collidePlatformLeft(object, leftTileX)) return;
-                    this.collidePlatformBottom(object, bottomTileY)
-                    break;
-                case 32: // 32 = c_bottom_right
+                case 33: //33 = right_top_bottom
                     if (this.collidePlatformRight(object, rightTileX)) return;
-                    this.collidePlatformBottom(object, bottomTileY);
+                    if (this.collidePlatformBottom(object, bottomTileY)) return;
+                    this.collidePlatformTop(object, topTileY)
                     break;
-                case 33: // 33 = c_bottom_left_right
-                    if (this.collidePlatformRight(object, rightTileX)) return;
+                case 34: //34 = left_top_bottom
                     if (this.collidePlatformLeft(object, leftTileX)) return;
-                    this.collidePlatformBottom(object, bottomTileY)
+                    if (this.collidePlatformBottom(object, bottomTileY)) return;
+                    this.collidePlatformTop(object, topTileY)
                     break;
+
                 case 41: //41 = top_left_right_bottom
                     if (this.collidePlatformLeft(object, leftTileX)) return;
                     if (this.collidePlatformRight(object, rightTileX)) return;
@@ -376,13 +401,9 @@ export class WorldController extends StateController {
                 case 51: // 51 = c_exit
                     this.switchLevel(this.gameModel.getCurrentLevel() + 1);
                     break;
-                case 52: // 52 = c_water
-                    break;
-                case 53: // 53 = c_coin
-                    break;
-                case 54: // 54 = c_enemy wohl ueberfluessaig, da sich alle bwegen werden
-                    break;
                 case 99:  // 99 = none
+                    break;
+                default:
                     break;
             }
         })
