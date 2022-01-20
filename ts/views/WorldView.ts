@@ -1,9 +1,9 @@
 import {State} from './State.js';
 import {GameModel} from "../models/GameModel.js";
-import {Player} from "../models/objects/Player.js";
-import {Coin, Door, Enemy, Heart, MovingPlatform, Water} from "../models/objects/GameObject.js";
-import {SpriteGroup} from "../models/objects/SpriteGroup.js";
-import {CANVAS_DATA} from "../game_config.js";
+import {Player} from "../models/Player.js";
+import {Coin, Door, Enemy, Heart, MovingPlatform, Water} from "../models/GameObject.js";
+import {SpriteGroup} from "../models/SpriteGroup.js";
+import {CANVAS_DATA} from "../canvas_config.js";
 
 /**
  * Erstellt ein WorldView Objekt. Die WorldView stellt die Spielewelt dar.
@@ -33,7 +33,7 @@ export class WorldView extends State {
         this._next = "startMenu";
         this.hudCtx = CANVAS_DATA.HUD_CTX;
         this.tileMapLevelData = gameModel.tileMapLevelData;
-        this._timeToFinishLevel = 100; // in seconds
+        this._timeToFinishLevel = 55; // in seconds
         this.player = gameModel.getPlayer();
         this.levelMap = [];
         this.tilesetMap = gameModel.worldImages["tilesetMap"];
@@ -76,7 +76,7 @@ export class WorldView extends State {
      * Initiert das jeweilige Level
      */
     initLevel() {
-        this._timeToFinishLevel = 100;
+        this._timeToFinishLevel = 55;
         this.loadMap();
         this.drawBackground();
         this.initHud();
@@ -90,6 +90,8 @@ export class WorldView extends State {
         this.levelTimer = setInterval(() => {
             this._timeToFinishLevel -= 1;
             if (this._timeToFinishLevel <= 0) {
+                this.player.died();
+                this.player.setYVelocity(this.player.getJumpHeight());
                 this.stopLevelTimer(this.levelTimer);
             }
         }, 1000);
@@ -360,17 +362,6 @@ export class WorldView extends State {
      * @private
      */
     private drawPlayer() {
-
-        // this.bufferCtx.drawImage(this.player.getPlayerSprites(),
-        //     this.player.playerData.frames[0].rect[0],//getTileX() * this.player.getSpriteWidth(),
-        //     this.player.playerData.frames[0].rect[1],//this.player.getTileY() * this.player.getSpriteHeight(),
-        //     this.player.playerData.frames[0].rect[2],//this.player.getSpriteWidth(),
-        //     this.player.playerData.frames[0].rect[3],//this.player.getSpriteHeight(),
-        //     this.player.getX(),
-        //     this.player.getY(),
-        //     this.player.getW(),// * this.player.playerData.frames[0].rect[2] /this.player.playerData.frames[0].rect[3],
-        //     this.player.getH());
-
         this.bufferCtx.drawImage(this.player.getPlayerSprites(),
             72 * this.player.currentFrame,
             97 * this.player.getTileY(),

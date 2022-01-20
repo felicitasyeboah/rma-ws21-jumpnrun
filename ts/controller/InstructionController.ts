@@ -1,6 +1,6 @@
 import {StateController} from "./StateController.js";
 import {GameModel} from "../models/GameModel.js";
-import {CANVAS_DATA} from "../game_config.js";
+import {CANVAS_DATA} from "../canvas_config.js";
 import Button from "../models/Button.js";
 import InstructionView from "../views/InstructionView.js";
 

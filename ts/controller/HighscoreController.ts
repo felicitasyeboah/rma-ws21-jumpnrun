@@ -1,7 +1,7 @@
 import {GameModel} from "../models/GameModel.js";
 import {StateController} from "./StateController.js";
 import HighscoreView from "../views/HighscoreView.js";
-import {CANVAS_DATA} from "../game_config.js";
+import {CANVAS_DATA} from "../canvas_config.js";
 import Button from "../models/Button.js";
 
 export class HighscoreController extends StateController {

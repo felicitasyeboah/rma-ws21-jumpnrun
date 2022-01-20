@@ -1,6 +1,6 @@
 import {GameModel} from "../models/GameModel.js";
 import {State} from "./State.js";
-import {CANVAS_DATA} from "../game_config.js";
+import {CANVAS_DATA} from "../canvas_config.js";
 import Button from "../models/Button.js";
 import {showHighScores} from "../highscore_utils.js";
 

@@ -2,7 +2,7 @@ import {StateController} from "./StateController.js";
 import {GameModel} from "../models/GameModel.js";
 import StartMenuView from "../views/StartMenuView.js";
 import Button from "../models/Button.js";
-import {CANVAS_DATA} from "../game_config.js";
+import {CANVAS_DATA} from "../canvas_config.js";
 /*
     Verarbeitet Benutzereingaben per Maus oder Tastatur,
     passt Daten des Models an und aktualisiert die StartMenuView

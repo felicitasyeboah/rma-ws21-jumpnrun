@@ -1,6 +1,6 @@
-import {Player} from "./objects/Player.js"
-import {Canvasdata, keyState} from "../game_config.js";
-import {SpriteGroup} from "./objects/SpriteGroup.js";
+import {Player} from "./Player.js"
+import {keyState} from "../canvas_config.js";
+import {SpriteGroup} from "./SpriteGroup.js";
 
 /**
  * Das GameModel hält alle Daten der Applikation

@@ -1,11 +1,11 @@
 import {GameModel} from "../models/GameModel.js";
-import {Player} from "../models/objects/Player.js";
-import {Coin, Enemy, GameObject, MovingPlatform, Water} from "../models/objects/GameObject.js";
+import {Player} from "../models/Player.js";
+import {Coin, Enemy, GameObject, MovingPlatform, Water} from "../models/GameObject.js";
 import {WorldView} from "../views/WorldView.js";
-import {SpriteGroup} from "../models/objects/SpriteGroup.js";
+import {SpriteGroup} from "../models/SpriteGroup.js";
 import {StateController} from "./StateController.js";
 import {checkHighScore, saveHighScore} from "../highscore_utils.js";
-import {CANVAS_DATA} from "../game_config.js";
+import {CANVAS_DATA} from "../canvas_config.js";
 import {TileFinder} from "./TileFinder.js";
 
 /**
@@ -100,6 +100,7 @@ export class WorldController extends StateController {
         // Restart-Level und Game Over-Fenster: wenn auf den Quit-Button geclickt wird -> Quit Game (zurueck zum Hauptmenue)
         if ((event.target.className == "btn btn-quit" && GameModel.KEY.ENTER.includes((event.key))) ||
             (event.type == "click" && event.target.className == "btn btn-quit")) {
+            this.view.next = "startMenu";
             this.quitGame();
         }
         // Game Over Fenster: wenn auf den Restart-Game-Button geclickt wird -> restart game
@@ -116,15 +117,6 @@ export class WorldController extends StateController {
             this.view.next = 'highscore';
             this.quitGame();
         }
-
-
-        // if (State.KEY.RIGHT.includes(event.key)) {
-        //     this.player.move("right");
-        // } else if (State.KEY.LEFT.includes(event.key)) {
-        //     this.player.move("left");
-        // } else if (State.KEY.JUMP.includes(event.key)) {
-        //     this.player.move("jump");
-        // }
     }
 
     // Updated die Daten für die View
@@ -140,7 +132,6 @@ export class WorldController extends StateController {
         }
         // wenn der spieler ein leben verloren hat, nur playerupdaten, alles andere ist angehalten
         else {
-            this.player.update();
             if (this.player.getY() <= 96) {
                 this.player.setYVelocity(0);
                 this.player.setY(96);
@@ -149,9 +140,10 @@ export class WorldController extends StateController {
             if(this.player.getY() <= 96) {
                 this.view.freeze = true;
             }
+            this.player.update();
 
-            // wenn Spieler keine Leben mehr hat
-            if (this.player.getLifeCounter() == 0) {
+            // wenn Spieler keine Leben mehr hat oder die Zeit abgelaufen ist
+            if ((this.player.getLifeCounter() == 0) || (this.view.timeToFinishLevel <= 0)){
 
                 // pruefen, ob ein neuer Highscore erreicht wurde
                 this.handleGameOver(this.player.getCoinCounter());
@@ -170,21 +162,36 @@ export class WorldController extends StateController {
     handleGameOver(userScore: number) {
         // wenn kein neuer Highscore erreich wurde
         if (!checkHighScore(userScore)) {
-            console.log("GameOver. kein neuer Highscore");
             CANVAS_DATA.DIV_GAME_OVER.style.display = "flex";
 
-            if (this.gameModel.getCurrentLevel() < this.gameModel.getMaxLevel()) {
-                CANVAS_DATA.DIV_GAME_OVER.querySelector('div')!.innerHTML = "Game over! <br/><br/><br/>Your score:<br/><br/>" + this.player.getCoinCounter();
-            } else if (this.gameModel.getCurrentLevel() == this.gameModel.getMaxLevel()) {
+            // wenn das ende des Spiels (maximalses Level) nicht erreicht wurde
+            if (this.gameModel.getCurrentLevel() <= this.gameModel.getMaxLevel()) {
+                // prüefe ob die zeit abgelaufen ist
+                if (this.view.timeToFinishLevel <= 0) {
+                    CANVAS_DATA.DIV_GAME_OVER.querySelector('div')!.innerHTML = "Time is up!<br/><br/><br/>Your score:<br/><br/>" + this.player.getCoinCounter();
+                }
+                // wenn keine Leben mehr vorhanden sind
+                else {
+                    CANVAS_DATA.DIV_GAME_OVER.querySelector('div')!.innerHTML = "Game over! <br/><br/><br/>Your score:<br/><br/>" + this.player.getCoinCounter();
+                }
+            // wenn das letzte Level durchgespeilt wurde
+            } else if (this.gameModel.getCurrentLevel() > this.gameModel.getMaxLevel()) {
                 CANVAS_DATA.DIV_GAME_OVER.querySelector('div')!.innerHTML = "You finished game! <br/><br/><br/> Your score:<br/><br/>" + this.player.getCoinCounter();
             }
         }
         // wenn ein neuer Highscore erreich wurde
         else {
             CANVAS_DATA.DIV_NEW_HIGHSCORE.style.display = "flex";
-            if (this.gameModel.getCurrentLevel() < this.gameModel.getMaxLevel()) {
-                CANVAS_DATA.DIV_NEW_HIGHSCORE.querySelector('div')!.innerHTML = "Game over<br /><br /><br /> New highscore:<br /><br />" + this.player.getCoinCounter();
-            } else if (this.gameModel.getCurrentLevel() == this.gameModel.getMaxLevel()) {
+            if (this.gameModel.getCurrentLevel() <= this.gameModel.getMaxLevel()) {
+                // wenn die Zeit abgelaufen war
+                if (this.view.timeToFinishLevel <= 0) {
+                    CANVAS_DATA.DIV_NEW_HIGHSCORE.querySelector('div')!.innerHTML = "Time is up!<br/><br/><br/>New highscore:<br/><br/>" + this.player.getCoinCounter();
+                }
+                // wenn keine Leben mehr vorhanden sind
+                else {
+                    CANVAS_DATA.DIV_NEW_HIGHSCORE.querySelector('div')!.innerHTML = "Game over<br /><br /><br /> New highscore:<br /><br />" + this.player.getCoinCounter();
+                }
+            } else if (this.gameModel.getCurrentLevel() > this.gameModel.getMaxLevel()) {
                 CANVAS_DATA.DIV_NEW_HIGHSCORE.querySelector('div')!.innerHTML = "You finished game! <br /><br /><br /> New highscore:<br /><br />" + this.player.getCoinCounter();
             }
         }
@@ -208,6 +215,7 @@ export class WorldController extends StateController {
         } else {
             //TODO: Ende des Spiels, Highscore/Score anzeigen
             console.log("maximales level erreicht");
+            this.view.freeze = true;
             this.handleGameOver(this.player.getCoinCounter());
         }
     }
@@ -253,7 +261,6 @@ export class WorldController extends StateController {
 
     // zurueck zum StartMenu -> setzt alle Daten zurueck
     private quitGame() {
-        this.view.next = "startMenu";
         this.view.done = true;
         this.view.freeze = false;
         CANVAS_DATA.DIV_RESTART.style.display = "none";
@@ -317,14 +324,14 @@ export class WorldController extends StateController {
             ybottom: number
         }) => {
             // nur zum Debuggen
-            CANVAS_DATA.BUFFER_CTX.strokeStyle = "blue";
+            /*CANVAS_DATA.BUFFER_CTX.strokeStyle = "blue";
             CANVAS_DATA.BUFFER_CTX.lineWidth = 1;
             CANVAS_DATA.BUFFER_CTX.beginPath();
             CANVAS_DATA.BUFFER_CTX.rect(
                 Math.floor(tile.xleft / CANVAS_DATA.TILE_SIZE) * CANVAS_DATA.TILE_SIZE,
                 Math.floor(tile.ytop / CANVAS_DATA.TILE_SIZE) * CANVAS_DATA.TILE_SIZE,
                 CANVAS_DATA.TILE_SIZE, CANVAS_DATA.TILE_SIZE);
-            CANVAS_DATA.BUFFER_CTX.stroke();
+            CANVAS_DATA.BUFFER_CTX.stroke();*/
 
             // 11 = c_left, 12 = c_top, 13 = c_right, 14 = c_bottom,
             // 21 = c_top_left, 22 = c_top_right, 23 = c_bottom_right, 24 = c_bottom_left,
@@ -368,6 +375,10 @@ export class WorldController extends StateController {
                     break;
                 case 24: // 24 = c_bottom_left
                     if (this.collidePlatformLeft(object, leftTileX)) return;
+                    this.collidePlatformBottom(object, bottomTileY)
+                    break;
+                case 25: // 25 = c_bottom_top
+                    if (this.collidePlatformTop(object, topTileY)) return;
                     this.collidePlatformBottom(object, bottomTileY)
                     break;
 
@@ -465,7 +476,7 @@ export class WorldController extends StateController {
 
     collidePlatformLeft(object: GameObject, tileLeft: number) {
         if (object.getRight() > tileLeft && object.getOldRight() <= tileLeft) {
-            object.setRight(tileLeft - 0.05);
+            object.setRight(tileLeft);
             object.setXVelocity(0);
             return true;
         } else {

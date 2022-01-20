@@ -1,5 +1,5 @@
-import {GameModel} from "../GameModel.js";
-import {CANVAS_DATA} from "../../game_config.js";
+import {GameModel} from "./GameModel.js";
+import {CANVAS_DATA} from "../canvas_config.js";
 
 export class GameObject {
     constructor(gameModel: GameModel, x: number, y: number) {
@@ -309,21 +309,20 @@ export class MovingPlatform extends MovingItem {
         this._moveY = moveY;
         this.baseX = x;
         this.baseY = y;
-        if(type == "movingPlatformX") {
-            this.x = this.baseX + Math.floor(Math.random() * (2 * CANVAS_DATA.TILE_SIZE)) - CANVAS_DATA.TILE_SIZE;
-            let dif = this.baseX - this.x;
-            this.moveCounter += -dif;
-        }
-        if(type == "movingPlatformY") {
-            this.y = this.baseY + Math.floor(Math.random() * (2 * CANVAS_DATA.TILE_SIZE)) - CANVAS_DATA.TILE_SIZE;
-            let dif = this.baseY - this.y;
-            this.moveCounter += -dif;
-        }
-        let myArray = [1,-1];
-        let rand = Math.floor(Math.random()*myArray.length);
-        let rValue = myArray[rand];
-        this.moveDirection = rValue;
-        console.log(rValue)
+        // if(type == "movingPlatformX") {
+        //     this.x = this.baseX + Math.floor(Math.random() * (2 * CANVAS_DATA.TILE_SIZE)) - CANVAS_DATA.TILE_SIZE;
+        //     let dif = this.baseX - this.x;
+        //     this.moveCounter += -dif;
+        // }
+        // if(type == "movingPlatformY") {
+        //     this.y = this.baseY + Math.floor(Math.random() * (2 * CANVAS_DATA.TILE_SIZE)) - CANVAS_DATA.TILE_SIZE;
+        //     let dif = this.baseY - this.y;
+        //     this.moveCounter += -dif;
+        // }
+        // let myArray = [1,-1];
+        // let rand = Math.floor(Math.random()*myArray.length);
+        // let rValue = myArray[rand];
+        // this.moveDirection = rValue;
         this.w = CANVAS_DATA.TILE_SIZE;
         this.h = CANVAS_DATA.TILE_SIZE / this.spriteData.movingPlatformX.w * this.spriteData.movingPlatformX.h;
         this._type = type;

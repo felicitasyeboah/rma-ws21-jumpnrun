@@ -6,10 +6,6 @@ const COLS = 20; // nach rechts
 const GAME_WIDTH = COLS * TILE_SIZE;
 const GAME_HEIGHT = ROWS * TILE_SIZE;
 
-// P Element um Punkte und Leben des Spielers anzuzeigen
-// const P = document.createElement("p");
-// P.setAttribute("style", "color:#ffffff; font-size:2.0em; position:fixed;");
-// document.body.appendChild(P);
 const DIV_WRAPPER = document.getElementById('wrapper')!;
 
 const DIV_PAUSE = document.getElementById("pause")!;

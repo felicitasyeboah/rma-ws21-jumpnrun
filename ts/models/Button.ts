@@ -1,4 +1,4 @@
-import {CANVAS_DATA} from "../game_config.js";
+import {CANVAS_DATA} from "../canvas_config.js";
 
 /**
  *  represaentiert einen Button auf dem Canvas

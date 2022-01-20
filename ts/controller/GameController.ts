@@ -1,5 +1,5 @@
 import {GameModel} from "../models/GameModel.js";
-import {CANVAS_DATA} from "../game_config.js";
+import {CANVAS_DATA} from "../canvas_config.js";
 
 /**
  * Der Gamecontroller startet den Gameloop. Er registriert Eventlistener und wechselt zwischen den einzelnen

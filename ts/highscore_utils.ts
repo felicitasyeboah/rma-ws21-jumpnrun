@@ -1,4 +1,4 @@
-import {CANVAS_DATA} from "./game_config.js";
+import {CANVAS_DATA} from "./canvas_config.js";
 
 const NO_OF_HIGH_SCORES = 10;
 const HIGHSCORE_STORAGE_NAME = 'highscore-list';

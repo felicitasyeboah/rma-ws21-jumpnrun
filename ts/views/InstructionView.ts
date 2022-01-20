@@ -1,6 +1,6 @@
 import {State} from "./State.js";
 import {GameModel} from "../models/GameModel.js";
-import {CANVAS_DATA} from "../game_config.js";
+import {CANVAS_DATA} from "../canvas_config.js";
 import Button from "../models/Button.js";
 
 export default class InstructionView extends State {

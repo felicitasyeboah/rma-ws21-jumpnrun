@@ -1,5 +1,5 @@
-import {GameModel} from "../GameModel.js";
-import {CANVAS_DATA, keyState} from "../../game_config.js";
+import {GameModel} from "./GameModel.js";
+import {CANVAS_DATA, keyState} from "../canvas_config.js";
 import {GameObject} from "./GameObject.js";
 
 /**
@@ -44,8 +44,8 @@ export class Player extends GameObject {
         // Sprite-width/-height berechnet wird
         this.maxTileY = (this.playerSprites.height / this.spriteHeight) - 1;
 
-        this.w = 42 * this.spriteWidth / this.spriteHeight;//*this.playerData.frames[0].rect[2] / this.playerData.frames[0].rect[3];
-        this.h = 42; // / this.spriteWidth * this.spriteHeight
+        this.w = 36 * this.spriteWidth / this.spriteHeight;//*this.playerData.frames[0].rect[2] / this.playerData.frames[0].rect[3];
+        this.h = 36; // / this.spriteWidth * this.spriteHeight
         this.x = 35;
         this.y = CANVAS_DATA.GAME_HEIGHT - CANVAS_DATA.TILE_SIZE - this.h;
 
@@ -101,24 +101,6 @@ export class Player extends GameObject {
             else this.currentFrame++;
         }
 
-        // switch (playerDirection) {
-        //     case "right":
-        //         this.tileY = 0
-        //         this.xVelocity += 1;
-        //             if (this.tileX >= this.maxTileX) this.tileX = 0;
-        //             else this.tileX++;
-        //         break;
-        //     case "left":
-        //         this.tileY = 1;
-        //         this.xVelocity -= 1;
-        //         if (this.tileX >= this.maxTileX) this.tileX = 0;
-        //         else this.tileX++;
-        //
-        //         break;
-        //     case "jump":
-        //         this.yVelocity -= this.jumpHeight;
-        //         break;
-        // }
     }
 
     died() {
@@ -140,9 +122,6 @@ export class Player extends GameObject {
             case 2:
                 this.gameModel.getHeartGroup().delete(this.gameModel.getHeartGroup().getSprites()[length - 1]);
                 break;
-        }
-        if (this.getLifeCounter() == 0) {
-            console.log("GameOver");
         }
     }
 
