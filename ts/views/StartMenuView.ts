@@ -12,7 +12,7 @@ export default class StartMenuView extends State {
     private _btnInstruction!: Button;
 
     constructor(private gameModel: GameModel) {
-        super(CANVAS_DATA);
+        super();
         this._next = "world";
         this.buttonWidth = 8;
         this.buttonHeight = 1.5;
@@ -20,12 +20,17 @@ export default class StartMenuView extends State {
 
     }
 
-
     startup(): void {
         this._initButtons();
         this._drawBackground();
         this._drawButtons();
+        this._drawHeadline();
     }
+
+    /**
+     * erstellt die Buttons der Startmenues
+     * @private
+     */
     private _initButtons() {
         this._btnStartGame = new Button(
             'world',
@@ -34,10 +39,10 @@ export default class StartMenuView extends State {
             6,
             7.5,
             '#FEA443', undefined,
-            '#3b899f', 7,
+            '#1f4854', 7,
             this.font,
             "START GAME",
-            "#3b899f");
+            "#1f4854");
 
         this._btnHighscore = new Button(
             'highscore',
@@ -68,8 +73,13 @@ export default class StartMenuView extends State {
         this._buttonGroup.set(this._btnInstruction.name, this._btnInstruction);
         this._activeButton = this._btnStartGame;
     }
+
+    /**
+     *  zeichnet die Buttons des Startmenues
+     * @private
+     */
     private _drawButtons() {
-         let yStart = 7.5 * CANVAS_DATA.TILE_SIZE;
+        let yStart = 7.5 * CANVAS_DATA.TILE_SIZE;
         let spacer = 2;
         this.buttonGroup.forEach((button) => {
 
@@ -108,6 +118,11 @@ export default class StartMenuView extends State {
             yStart += spacer;
         })
     }
+
+    /**
+     * zeichnet den Hintergrund
+     * @private
+     */
     private _drawBackground() {
         this.bufferCtx.drawImage(
             this.gameModel.backgroundImage,
@@ -118,18 +133,37 @@ export default class StartMenuView extends State {
         );
     }
 
+    /**
+     * zeichnet die Ueberschrift
+     * @private
+     */
+    private _drawHeadline() {
+        this.bufferCtx.font = "2.4em" + CANVAS_DATA.FONT;
+        this.bufferCtx.fillStyle = "#1f4854";
+        this.bufferCtx.fillText("* PIXL JUMPER *", CANVAS_DATA.TILE_SIZE*10, CANVAS_DATA.TILE_SIZE * 4);
+
+    }
+
+    /**
+     * Raumt die view auf, vor eintritt in eine neue View
+     */
     cleanup(): void {
-        this.CANVAS_DATA.BUFFER_CTX.clearRect(0,0, CANVAS_DATA.BUFFER_CANVAS.width, CANVAS_DATA.BUFFER_CANVAS.height);
+        CANVAS_DATA.BUFFER_CTX.clearRect(0,0, CANVAS_DATA.BUFFER_CANVAS.width, CANVAS_DATA.BUFFER_CANVAS.height);
         this._buttonGroup.clear();
 
     }
 
+    /**
+     * updated...
+     */
     update(){
-        this.CANVAS_DATA.BUFFER_CTX.clearRect(0,0, CANVAS_DATA.BUFFER_CANVAS.width, CANVAS_DATA.BUFFER_CANVAS.height);
+        CANVAS_DATA.BUFFER_CTX.imageSmoothingEnabled = false;
+        CANVAS_DATA.BUFFER_CTX.clearRect(0,0, CANVAS_DATA.BUFFER_CANVAS.width, CANVAS_DATA.BUFFER_CANVAS.height);
         this._drawBackground();
         this._drawButtons();
-    }
+        this._drawHeadline();
 
+    }
 
     get btnStartGame(): Button {
         return this._btnStartGame;
@@ -154,7 +188,5 @@ export default class StartMenuView extends State {
     set btnInstruction(value: Button) {
         this._btnInstruction = value;
     }
-
-
 
 }
